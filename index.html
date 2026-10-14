@@ -2,6 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<!-- 外部画像サーバー(DMM/Prestige等)の直リンク拒否(403エラー)を回避する設定 -->
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -52,7 +54,6 @@
     flex-shrink: 0;
   }
 
-  /* Header */
   header {
     position: sticky;
     top: 0;
@@ -68,12 +69,13 @@
   }
 
   .header-side {
-    width: 82px;
+    width: 88px;
     display: flex;
     align-items: center;
   }
   .header-side.right {
     justify-content: flex-end;
+    gap: 6px;
   }
 
   .btn-back-minimal {
@@ -91,7 +93,7 @@
   .btn-back-minimal:active { opacity: 0.6; }
 
   .header-title {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 600;
     letter-spacing: 0.16em;
     color: var(--gold-bright);
@@ -102,15 +104,27 @@
     text-overflow: ellipsis;
   }
 
+  .sync-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  .sync-dot.online { background: #d4af37; box-shadow: 0 0 6px #f3dfb2; }
+  .sync-dot.syncing { background: #fff; animation: pulse 0.8s infinite alternate; }
+  @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+
   .btn-gold {
     background: linear-gradient(180deg, #211d15 0%, #100e0a 100%);
     color: var(--gold-bright);
     border: 1px solid var(--gold-border);
     border-radius: 5px;
-    padding: 6px 12px;
-    font-size: 0.76rem;
+    padding: 6px 11px;
+    font-size: 0.75rem;
     font-family: inherit;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -129,7 +143,6 @@
     border-color: var(--gold-bright);
   }
 
-  /* Control Bar */
   .control-bar {
     padding: 10px 14px;
     display: flex;
@@ -138,12 +151,9 @@
     background: rgba(12, 12, 14, 0.9);
     border-bottom: 1px solid var(--gold-border-dim);
   }
-  .control-top {
-    display: flex;
-    gap: 8px;
-  }
+  .control-top { display: flex; gap: 8px; }
 
-  select, input[type="text"], input[type="number"], input[type="date"], textarea {
+  select, input[type="text"], input[type="password"], input[type="number"], input[type="date"], textarea {
     background: #09090b;
     color: var(--text-main);
     border: 1px solid var(--gold-border);
@@ -152,6 +162,8 @@
     font-size: 0.82rem;
     font-family: -apple-system, sans-serif;
     outline: none;
+    user-select: text;
+    -webkit-user-select: text;
   }
   select:focus, input:focus, textarea:focus {
     border-color: var(--gold-bright);
@@ -184,7 +196,7 @@
     border-color: var(--gold-bright);
   }
 
-  /* Roster Grid (3 Columns, Double Gold Frame like Concept Image 1) */
+  /* Roster Grid */
   .roster-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -239,7 +251,6 @@
     padding: 1px 5px;
     border-radius: 3px;
     font-family: -apple-system, sans-serif;
-    letter-spacing: 0.04em;
   }
 
   .card-info {
@@ -262,17 +273,15 @@
     font-size: 0.66rem;
     color: var(--gold-main);
     font-family: -apple-system, sans-serif;
-    letter-spacing: 0.03em;
   }
 
-  /* Detail View (Concept Image 2: Centered Double Gold Frame Portrait) */
+  /* Detail Hero */
   .detail-hero {
     padding: 20px 16px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
     background: radial-gradient(circle at 50% 25%, rgba(205, 168, 97, 0.12), transparent 70%);
-    position: relative;
   }
 
   .portrait-frame {
@@ -299,7 +308,7 @@
     justify-content: center;
     gap: 6px;
     margin-bottom: 10px;
-    max-width: 92%;
+    max-width: 94%;
   }
   .spec-pill {
     background: linear-gradient(180deg, rgba(45, 36, 20, 0.85), rgba(20, 16, 9, 0.9));
@@ -309,7 +318,6 @@
     padding: 3px 9px;
     border-radius: 4px;
     font-family: -apple-system, sans-serif;
-    letter-spacing: 0.04em;
   }
   .attr-pill {
     background: rgba(255, 255, 255, 0.03);
@@ -328,10 +336,7 @@
     margin-bottom: 12px;
     font-family: -apple-system, sans-serif;
   }
-  .detail-stat-line strong {
-    color: var(--gold-bright);
-    font-weight: 600;
-  }
+  .detail-stat-line strong { color: var(--gold-bright); }
 
   .nominate-btn {
     width: 100%;
@@ -347,18 +352,10 @@
     letter-spacing: 0.12em;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s;
   }
-  .nominate-btn:active {
-    transform: scale(0.98);
-    background: linear-gradient(180deg, #3d311d 0%, #1a140b 100%);
-  }
+  .nominate-btn:active { transform: scale(0.98); }
 
-  /* Metallic Gold Sub-Tabs (Exactly like Concept Image 2) */
+  /* Sub Tabs */
   .sub-tabs {
     display: flex;
     border-top: 1px solid var(--gold-border-dim);
@@ -376,7 +373,6 @@
     letter-spacing: 0.06em;
     color: var(--text-sub);
     cursor: pointer;
-    transition: all 0.2s;
     border-bottom: 2px solid transparent;
   }
   .sub-tab.active {
@@ -387,7 +383,7 @@
     font-weight: 600;
   }
 
-  /* Folder Grid (4 Columns with Gold Frame like Concept Image 2) */
+  /* Folder Grid (4 Columns) */
   .folder-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -461,7 +457,6 @@
     font-size: 0.7rem;
     color: var(--gold-main);
     font-family: monospace;
-    letter-spacing: 0.05em;
   }
   .work-title {
     font-size: 0.85rem;
@@ -490,9 +485,8 @@
     text-decoration: none;
     cursor: pointer;
   }
-  .btn-mini:active { border-color: var(--gold-bright); }
 
-  /* Analytics & Arena Sections */
+  /* Panels & Charts */
   .section-wrap {
     padding: 16px 14px;
     display: flex;
@@ -518,7 +512,6 @@
     justify-content: space-between;
   }
 
-  /* Bar Charts for Preference DNA */
   .stat-bar-row {
     display: flex;
     align-items: center;
@@ -554,7 +547,7 @@
     font-size: 0.74rem;
   }
 
-  /* Gacha Stage */
+  /* Gacha & VS */
   .gacha-stage {
     margin: 14px auto;
     width: 200px;
@@ -566,7 +559,6 @@
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 0 24px rgba(205, 168, 97, 0.2);
   }
   .gacha-stage img {
     width: 100%;
@@ -600,7 +592,7 @@
     margin-top: 10px;
   }
 
-  /* Calendar (Gold Gradation Heatmap) */
+  /* Calendar */
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -627,25 +619,11 @@
     color: var(--text-sub);
     cursor: pointer;
   }
-  .cal-cell.heat-1 {
-    background: rgba(140, 109, 50, 0.28);
-    border-color: var(--gold-main);
-    color: var(--text-main);
-  }
-  .cal-cell.heat-2 {
-    background: rgba(205, 168, 97, 0.52);
-    border-color: var(--gold-bright);
-    color: #fff;
-  }
-  .cal-cell.heat-3 {
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold-main));
-    border-color: #fff;
-    color: #050506;
-    font-weight: 700;
-    box-shadow: 0 0 12px var(--gold-glow);
-  }
+  .cal-cell.heat-1 { background: rgba(140, 109, 50, 0.28); border-color: var(--gold-main); color: var(--text-main); }
+  .cal-cell.heat-2 { background: rgba(205, 168, 97, 0.52); border-color: var(--gold-bright); color: #fff; }
+  .cal-cell.heat-3 { background: linear-gradient(135deg, var(--gold-bright), var(--gold-main)); border-color: #fff; color: #050506; font-weight: 700; }
 
-  /* Bottom Navigation (Concept Image Style with Gold Glow) */
+  /* Bottom Navigation */
   .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -670,14 +648,9 @@
     letter-spacing: 0.06em;
     cursor: pointer;
     flex: 1;
-    position: relative;
   }
-  .nav-item.active {
-    color: var(--gold-bright);
-  }
-  .nav-item.active .svg-icon {
-    filter: drop-shadow(0 0 6px rgba(243, 223, 178, 0.7));
-  }
+  .nav-item.active { color: var(--gold-bright); }
+  .nav-item.active .svg-icon { filter: drop-shadow(0 0 6px rgba(243, 223, 178, 0.7)); }
 
   /* Lightbox */
   .lightbox {
@@ -730,7 +703,6 @@
     display: flex;
     flex-direction: column;
     gap: 11px;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.9);
   }
   .form-row {
     display: flex;
@@ -739,6 +711,21 @@
     font-size: 0.76rem;
     color: var(--gold-bright);
     font-family: -apple-system, sans-serif;
+  }
+
+  .preview-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  .preview-strip img {
+    width: 68px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+    flex-shrink: 0;
   }
 
   .hidden { display: none !important; }
@@ -751,15 +738,14 @@
     background: linear-gradient(135deg, var(--gold-bright), var(--gold-main));
     color: #050506;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     padding: 8px 18px;
     border-radius: 4px;
     z-index: 300;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.8);
+    white-space: nowrap;
   }
 </style>
 </head>
@@ -767,13 +753,15 @@
 
 <div id="toast">記録を更新しました</div>
 
-<!-- Header -->
 <header>
   <div class="header-side">
     <button id="btn-back" class="btn-back-minimal hidden" onclick="showRoster()">
       <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       <span>戻る</span>
     </button>
+    <span id="sync-indicator" onclick="switchMainView('settings')" style="font-size:0.65rem; color:var(--text-sub); cursor:pointer; font-family:sans-serif; display:flex; align-items:center;">
+      <span id="sync-dot" class="sync-dot"></span><span id="sync-label">未同期</span>
+    </span>
   </div>
   <div id="header-title" class="header-title">帝国の名簿</div>
   <div class="header-side right">
@@ -782,7 +770,7 @@
   </div>
 </header>
 
-<!-- VIEW 1: ROSTER (名簿ホーム) -->
+<!-- VIEW 1: ROSTER -->
 <section id="view-roster">
   <div class="control-bar">
     <div class="control-top">
@@ -799,13 +787,12 @@
   <div id="roster-grid" class="roster-grid"></div>
 </section>
 
-<!-- VIEW 2: ACTRESS DETAIL (女優別個室 - コンセプト画像完全準拠) -->
+<!-- VIEW 2: ACTRESS DETAIL -->
 <section id="view-detail" class="hidden">
   <div class="detail-hero">
     <div class="portrait-frame">
-      <img id="detail-avatar" src="" alt="">
+      <img id="detail-avatar" src="" alt="" referrerpolicy="no-referrer">
     </div>
-    <!-- 画面上部の属性・スペック一覧（生年月日からの自動計算年齢・カップ数・タグ） -->
     <div id="detail-specs" class="spec-badges"></div>
     <div class="detail-stat-line">
       累計指名回数：<strong id="detail-count">0</strong> 回
@@ -815,7 +802,6 @@
     </button>
   </div>
 
-  <!-- 左：作品・サンプル一覧（デフォルト） ／ 右：フォルダ（ギャラリー） -->
   <div class="sub-tabs">
     <div id="subtab-works" class="sub-tab active" onclick="switchDetailTab('works')">
       <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="7" y1="3" x2="7" y2="21"/><line x1="17" y1="3" x2="17" y2="21"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
@@ -827,7 +813,6 @@
     </div>
   </div>
 
-  <!-- 左タブ内容：作品一覧 -->
   <div id="detail-works-pane">
     <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center;">
       <span style="font-size:0.76rem; color:var(--text-sub); letter-spacing:0.06em;">登録作品アーカイブ</span>
@@ -836,7 +821,6 @@
     <div id="works-list" class="works-list"></div>
   </div>
 
-  <!-- 右タブ内容：写真・GIFフォルダ (4列グリッド) -->
   <div id="detail-folder-pane" class="hidden">
     <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;">
       <label class="btn-gold" style="flex:1;">
@@ -849,10 +833,9 @@
   </div>
 </section>
 
-<!-- VIEW 3: ANALYTICS & ARENA (好み分析 ＆ 迷った時のツール) -->
+<!-- VIEW 3: ANALYTICS & ARENA -->
 <section id="view-analytics" class="hidden">
   <div class="section-wrap">
-    <!-- Preference DNA Analysis -->
     <div class="lux-panel">
       <div class="panel-title">
         <span>あなたの好み・偏愛データ分析</span>
@@ -870,12 +853,11 @@
       <div id="dna-tag-bars"></div>
     </div>
 
-    <!-- SSR Summon & 1v1 -->
     <div class="lux-panel" style="text-align:center;">
       <div class="panel-title"><span>今夜の運命召喚（シルエット解除）</span></div>
       <p style="font-size:0.74rem; color:var(--text-sub);">枠をタップするとヴェールが解かれ高画質ビジュアルが顕現します</p>
       <div id="gacha-stage" class="gacha-stage concealed" onclick="revealGacha()">
-        <img id="gacha-img" src="" alt="">
+        <img id="gacha-img" src="" alt="" referrerpolicy="no-referrer">
         <div id="gacha-overlay" class="gacha-overlay-text">
           <span>TAP TO UNLOCK</span>
         </div>
@@ -896,7 +878,7 @@
   </div>
 </section>
 
-<!-- VIEW 4: CALENDAR (履歴) -->
+<!-- VIEW 4: CALENDAR -->
 <section id="view-calendar" class="hidden">
   <div class="section-wrap">
     <div class="lux-panel">
@@ -916,12 +898,34 @@
   </div>
 </section>
 
-<!-- VIEW 5: SETTINGS -->
+<!-- VIEW 5: SETTINGS (GitHub Cloud Auto-Sync) -->
 <section id="view-settings" class="hidden">
   <div class="section-wrap" style="font-family:-apple-system, sans-serif;">
     <div class="lux-panel" style="display:flex; flex-direction:column; gap:10px;">
-      <div class="panel-title" style="font-family:serif;"><span>データ保管庫（バックアップ・復元）</span></div>
-      <p style="font-size:0.76rem; color:var(--text-sub); line-height:1.5;">登録した女優・作品・フォルダ内の画像をJSONファイルとして書き出し・復元できます。</p>
+      <div class="panel-title" style="font-family:serif;"><span>GitHub クラウド自動同期（別端末・シークレット対応）</span></div>
+      <p style="font-size:0.74rem; color:var(--text-sub); line-height:1.5;">
+        GitHubのPersonal Access Token（repo権限）を設定すると、データを追加・指名するたびにあなたのリポジトリ内の <code>data.json</code> へ自動保存され、プライベートブラウズや別端末でも常に同じデータが同期されます。
+      </p>
+      <div class="form-row">
+        <label>GitHub ユーザー名 / リポジトリ名（自動検出済）</label>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="gh-owner" placeholder="apomen932-code" style="flex:1;">
+          <input type="text" id="gh-repo" placeholder="リポジトリ名" style="flex:1;">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>GitHub Personal Access Token (ghp_...)</label>
+        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      </div>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <button class="btn-gold solid" style="flex:1;" onclick="saveGitHubConfigAndSync()">保存して今すぐ同期</button>
+        <button class="btn-gold" onclick="pullFromGitHub(true)">GitHubから強制読込</button>
+      </div>
+      <div id="gh-sync-log" style="font-size:0.72rem; color:var(--gold-main); margin-top:4px;"></div>
+    </div>
+
+    <div class="lux-panel" style="display:flex; flex-direction:column; gap:10px;">
+      <div class="panel-title" style="font-family:serif;"><span>ファイル書き出し・復元（手動用）</span></div>
       <button class="btn-gold" onclick="exportDatabase()">データを書き出す (JSON保存)</button>
       <label class="btn-gold">
         <span>データを読み込む (JSON復元)</span>
@@ -933,7 +937,7 @@
 
 <!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
-  <img id="lightbox-img" src="" alt="">
+  <img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer">
   <div id="lightbox-caption" style="color:var(--gold-bright); font-size:0.82rem; margin-top:10px; letter-spacing:0.05em;"></div>
   <div class="lightbox-controls" onclick="event.stopPropagation()">
     <button class="btn-gold" onclick="stepLightbox(-1)">前へ</button>
@@ -944,7 +948,7 @@
   </div>
 </div>
 
-<!-- MODAL: ACTRESS ADD/EDIT (生年月日対応) -->
+<!-- MODAL: ACTRESS -->
 <div id="modal-actress" class="modal-backdrop">
   <div class="modal-card">
     <div class="panel-title"><span>女優プロフィールの登録・編集</span></div>
@@ -984,29 +988,30 @@
   </div>
 </div>
 
-<!-- MODAL: WORK ADD (品番からの自動取得機能付き) -->
+<!-- MODAL: WORK ADD (高精度自動取得) -->
 <div id="modal-work" class="modal-backdrop">
   <div class="modal-card">
     <div class="panel-title"><span>作品・サンプル画像の登録</span></div>
     <div class="form-row">
-      <label>品番（入力して「自動取得」を押すとタイトル・サンプル画像を検索します）</label>
+      <label>品番（例：ABF-391 / SONE-123 / START-001）</label>
       <div style="display:flex; gap:6px;">
-        <input type="text" id="work-code" placeholder="例：ABF-391 / SONE-123" style="flex:1;">
+        <input type="text" id="work-code" placeholder="ABF-391" style="flex:1;">
         <button type="button" id="btn-autofetch" class="btn-gold solid" onclick="autoFetchByCode()">自動取得</button>
       </div>
-      <div id="autofetch-status" style="font-size:0.72rem; color:var(--gold-main); margin-top:2px;"></div>
+      <div id="autofetch-status" style="font-size:0.72rem; color:var(--gold-main); margin-top:3px;"></div>
+      <div id="autofetch-preview" class="preview-strip"></div>
     </div>
     <div class="form-row">
       <label>作品タイトル *</label>
-      <input type="text" id="work-title" placeholder="作品タイトル">
+      <input type="text" id="work-title" placeholder="自動取得または手動入力">
     </div>
     <div class="form-row">
       <label>視聴ページURL（任意）</label>
       <input type="text" id="work-url" placeholder="https://...">
     </div>
     <div class="form-row">
-      <label>サンプル画像URL一覧（自動取得されたURLが入ります／手動追加も可）</label>
-      <textarea id="work-sample-urls" rows="3" placeholder="1行目が表紙パッケージ、2行目以降がサンプル画像になります"></textarea>
+      <label>画像URL一覧（1行目が表紙、2行目以降がサンプル画像）</label>
+      <textarea id="work-sample-urls" rows="3" placeholder="自動取得されたURLが入ります" oninput="renderUrlPreviewStrip()"></textarea>
     </div>
     <div class="form-row">
       <label>または端末から画像ファイルを追加（複数選択可）</label>
@@ -1019,7 +1024,7 @@
   </div>
 </div>
 
-<!-- Bottom Navigation (SVG Line Icons, No Emojis) -->
+<!-- Bottom Navigation -->
 <nav class="bottom-nav">
   <div id="nav-roster" class="nav-item active" onclick="switchMainView('roster')">
     <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1041,7 +1046,7 @@
 
 <script>
 /* =========================================================
-   IndexedDB Storage
+   IndexedDB & GitHub Cloud Sync Engine
 ========================================================= */
 const DB_NAME = 'EmpireArchiveDB';
 const DB_VERSION = 1;
@@ -1051,20 +1056,21 @@ let state = {
   actresses: [],
   works: [],
   media: [],
-  logs: []
+  logs: [],
+  updatedAt: 0
 };
 
 let currentActressId = null;
 let activeTagFilter = null;
 let currentCalDate = new Date();
-
 let lightboxList = [];
 let lightboxIndex = 0;
 let paraparaTimer = null;
-
 let currentGachaActressId = null;
 let tournamentPool = [];
 let tournamentNext = [];
+let ghFileSha = null;
+let syncTimer = null;
 
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -1078,11 +1084,15 @@ function initDB() {
   });
 }
 
-function saveState() {
+function saveState(skipCloud = false) {
+  state.updatedAt = Date.now();
   return new Promise((resolve) => {
     const tx = db.transaction('kv', 'readwrite');
     tx.objectStore('kv').put(state, 'appState');
-    tx.oncomplete = () => resolve();
+    tx.oncomplete = () => {
+      if (!skipCloud) scheduleCloudPush();
+      resolve();
+    };
   });
 }
 
@@ -1097,8 +1107,345 @@ function loadState() {
   });
 }
 
+/* --- GitHub Auto-Detect & Cloud Sync --- */
+function detectGitHubRepo() {
+  const savedOwner = localStorage.getItem('gh_owner');
+  const savedRepo = localStorage.getItem('gh_repo');
+  const savedToken = localStorage.getItem('gh_token') || '';
+
+  let defaultOwner = 'apomen932-code';
+  let defaultRepo = '';
+
+  if (location.hostname.endsWith('.github.io')) {
+    defaultOwner = location.hostname.replace('.github.io', '');
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    defaultRepo = pathParts.length > 0 ? pathParts[0] : `${defaultOwner}.github.io`;
+  }
+
+  document.getElementById('gh-owner').value = savedOwner || defaultOwner;
+  document.getElementById('gh-repo').value = savedRepo || defaultRepo;
+  document.getElementById('gh-token').value = savedToken;
+  updateSyncBadge(savedToken ? 'online' : 'offline');
+}
+
+function updateSyncBadge(status, text) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot';
+  if (status === 'online') {
+    dot.classList.add('online');
+    label.textContent = text || 'GitHub同期済';
+  } else if (status === 'syncing') {
+    dot.classList.add('syncing');
+    label.textContent = text || '同期中...';
+  } else {
+    label.textContent = text || '未同期';
+  }
+}
+
+async function saveGitHubConfigAndSync() {
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  if (!owner || !repo || !token) return alert('オーナー名、リポジトリ名、トークンをすべて入力してください');
+
+  localStorage.setItem('gh_owner', owner);
+  localStorage.setItem('gh_repo', repo);
+  localStorage.setItem('gh_token', token);
+
+  document.getElementById('gh-sync-log').textContent = 'GitHubリポジトリと通信中...';
+  // ローカルが空（プライベートブラウズ等）ならGitHubから読み込み、データがあればプッシュ
+  if (state.actresses.length === 0) {
+    const pulled = await pullFromGitHub(true);
+    if (!pulled) await pushToGitHub();
+  } else {
+    await pushToGitHub();
+  }
+}
+
+function scheduleCloudPush() {
+  const token = localStorage.getItem('gh_token');
+  if (!token) return;
+  updateSyncBadge('syncing', '保存予約...');
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { pushToGitHub(); }, 1200);
+}
+
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+}
+
+function base64ToUtf8(b64) {
+  const bin = atob(b64.replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+async function pullFromGitHub(manual = false) {
+  const owner = localStorage.getItem('gh_owner') || document.getElementById('gh-owner').value.trim();
+  const repo = localStorage.getItem('gh_repo') || document.getElementById('gh-repo').value.trim();
+  const token = localStorage.getItem('gh_token') || document.getElementById('gh-token').value.trim();
+
+  if (!owner || !repo) return false;
+  updateSyncBadge('syncing', 'クラウド読込中');
+
+  try {
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (token) headers['Authorization'] = `token ${token}`;
+
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data.json?t=${Date.now()}`, { headers });
+    if (!res.ok) {
+      if (manual) document.getElementById('gh-sync-log').textContent = 'GitHub上にまだ data.json がありません。現在のデータを新規保存します。';
+      updateSyncBadge(token ? 'online' : 'offline', '待機中');
+      return false;
+    }
+    const fileData = await res.json();
+    ghFileSha = fileData.sha;
+
+    let jsonStr = '';
+    if (fileData.content) {
+      jsonStr = base64ToUtf8(fileData.content);
+    } else if (fileData.download_url) {
+      const rawRes = await fetch(fileData.download_url + `?t=${Date.now()}`);
+      jsonStr = await rawRes.text();
+    }
+
+    const remoteState = JSON.parse(jsonStr);
+    if (remoteState && Array.isArray(remoteState.actresses)) {
+      if (manual || state.actresses.length === 0 || (remoteState.updatedAt || 0) > (state.updatedAt || 0)) {
+        state = remoteState;
+        await saveState(true);
+        renderRoster();
+        if (manual) showToast('GitHubから最新データを復元しました');
+      }
+    }
+    updateSyncBadge('online', 'GitHub同期済');
+    if (manual) document.getElementById('gh-sync-log').textContent = `最終同期完了: ${new Date().toLocaleTimeString()}`;
+    return true;
+  } catch (e) {
+    updateSyncBadge('offline', '読込エラー');
+    if (manual) document.getElementById('gh-sync-log').textContent = '読込エラー: ' + e.message;
+    return false;
+  }
+}
+
+async function pushToGitHub() {
+  const owner = localStorage.getItem('gh_owner');
+  const repo = localStorage.getItem('gh_repo');
+  const token = localStorage.getItem('gh_token');
+  if (!owner || !repo || !token) return;
+
+  updateSyncBadge('syncing', 'GitHub保存中...');
+  try {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/data.json`;
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    };
+
+    if (!ghFileSha) {
+      const check = await fetch(apiUrl, { headers });
+      if (check.ok) {
+        const existing = await check.json();
+        ghFileSha = existing.sha;
+      }
+    }
+
+    const body = {
+      message: `Auto-sync archive data (${new Date().toLocaleString('ja-JP')})`,
+      content: utf8ToBase64(JSON.stringify(state))
+    };
+    if (ghFileSha) body.sha = ghFileSha;
+
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!putRes.ok) throw new Error(`HTTP ${putRes.status}`);
+    const putData = await putRes.json();
+    ghFileSha = putData.content.sha;
+
+    updateSyncBadge('online', 'GitHub保存済');
+    const logEl = document.getElementById('gh-sync-log');
+    if (logEl) logEl.textContent = `GitHubへ自動保存完了 (${new Date().toLocaleTimeString()})`;
+  } catch (e) {
+    updateSyncBadge('offline', '同期失敗');
+    const logEl = document.getElementById('gh-sync-log');
+    if (logEl) logEl.textContent = `保存エラー（トークン権限等を確認してください）: ${e.message}`;
+  }
+}
+
 /* =========================================================
-   Birthday & Age Calculation Helper
+   Product Code Auto-Fetch (改良版: リファラー回避 + 複数CDN & メタデータ検索)
+========================================================= */
+function buildCandidateUrls(rawCode) {
+  const clean = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const m = clean.match(/^([A-Z]+)(\d+)$/);
+  if (!m) return { code: clean, covers: [], samplePatterns: [] };
+
+  const prefix = m[1].toLowerCase();
+  const num = m[2];
+  const pad3 = num.padStart(3, '0');
+  const pad5 = num.padStart(5, '0');
+
+  // Prestige系メーカープレフィックス判定
+  const prestigePrefixes = ['abf', 'abp', 'abw', 'abs', 'sga', 'chn', 'onez', 'ama', 'bgn', 'docp', 'mgt', 'esk', 'kbi', 'tre'];
+  const isPrestige = prestigePrefixes.includes(prefix);
+
+  const cids = [];
+  if (isPrestige) {
+    cids.push(`118${prefix}${pad3}`, `118${prefix}${pad5}`, `${prefix}${pad3}`, `${prefix}${pad5}`);
+  } else {
+    cids.push(`${prefix}${pad5}`, `${prefix}${pad3}`, `1${prefix}${pad3}`, `1${prefix}${pad5}`, `118${prefix}${pad3}`, `h_${prefix}${pad3}`);
+  }
+
+  const covers = [];
+  // Prestige公式CDN
+  if (isPrestige) {
+    covers.push(`https://www.prestige-av.com/api/media/goods/prestige/${prefix}/${pad3}/pb_${prefix}-${pad3}.jpg`);
+    covers.push(`https://www.prestige-av.com/ images/corner/goods/prestige/${prefix}/${pad3}/pb_${prefix}-${pad3}.jpg`.replace(' ', ''));
+  }
+  // DMM CDN (digital & mono)
+  cids.forEach(cid => {
+    covers.push(`https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`);
+    covers.push(`https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`);
+  });
+
+  return { prefix, pad3, cids, isPrestige, covers };
+}
+
+function probeImageNoReferrer(url, timeoutMs = 4000) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.referrerPolicy = 'no-referrer';
+    let done = false;
+    const finish = (ok) => { if (!done) { done = true; resolve(ok); } };
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    img.onload = () => {
+      clearTimeout(timer);
+      // DMMのダミー画像(Now Printing: 100x75等)を除外
+      if (img.naturalWidth > 140 && img.naturalHeight > 105) finish(true);
+      else finish(false);
+    };
+    img.onerror = () => { clearTimeout(timer); finish(false); };
+    img.src = url;
+  });
+}
+
+async function autoFetchByCode() {
+  const rawCode = document.getElementById('work-code').value.trim();
+  if (!rawCode) return alert('品番を入力してください（例：ABF-391）');
+
+  const statusEl = document.getElementById('autofetch-status');
+  const btn = document.getElementById('btn-autofetch');
+  btn.disabled = true;
+  statusEl.textContent = '複数サーバーからパッケージ・サンプル画像を探索中...';
+
+  const m = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').match(/^([A-Z]+)(\d+)$/);
+  const normalizedCode = m ? `${m[1]}-${m[2].padStart(3, '0')}` : rawCode.toUpperCase();
+  document.getElementById('work-code').value = normalizedCode;
+
+  const info = buildCandidateUrls(normalizedCode);
+  const foundImages = [];
+
+  // 1. パッケージ画像を検出
+  let matchedCid = null;
+  for (const cUrl of info.covers) {
+    const ok = await probeImageNoReferrer(cUrl, 3200);
+    if (ok) {
+      foundImages.push(cUrl);
+      const cidMatch = cUrl.match(/\/(?:video|adult)\/([^\/]+)\//);
+      if (cidMatch) matchedCid = cidMatch[1];
+      break;
+    }
+  }
+
+  // もしカバーがまだ未確定なら全CID候補でサンプル1枚目をテストしてCIDを特定
+  if (!matchedCid && info.cids) {
+    for (const cid of info.cids) {
+      const testSample = `https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-1.jpg`;
+      if (await probeImageNoReferrer(testSample, 2500)) {
+        matchedCid = cid;
+        break;
+      }
+    }
+  }
+
+  // 2. サンプル画像を並列プローブ (jp-1 〜 jp-12 および -1 〜 -12)
+  if (matchedCid) {
+    const checks = [];
+    for (let i = 1; i <= 12; i++) {
+      const u1 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}jp-${i}.jpg`;
+      const u2 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}-${i}.jpg`;
+      checks.push(
+        probeImageNoReferrer(u1, 2800).then(async ok => {
+          if (ok) return u1;
+          const ok2 = await probeImageNoReferrer(u2, 2200);
+          return ok2 ? u2 : null;
+        })
+      );
+    }
+    const sampleResults = await Promise.all(checks);
+    sampleResults.filter(Boolean).forEach(u => foundImages.push(u));
+  }
+
+  // Prestige公式のサンプル画像フォールバック
+  if (foundImages.length <= 1 && info.isPrestige) {
+    const pChecks = [];
+    for (let i = 1; i <= 10; i++) {
+      const pu = `https://www.prestige-av.com/api/media/goods/prestige/${info.prefix}/${info.pad3}/pf_${info.prefix}-${info.pad3}_${i}.jpg`;
+      pChecks.push(probeImageNoReferrer(pu, 2500).then(ok => ok ? pu : null));
+    }
+    const pRes = await Promise.all(pChecks);
+    pRes.filter(Boolean).forEach(u => foundImages.push(u));
+  }
+
+  // 3. タイトル取得（複数プロキシフォールバック）
+  if (!document.getElementById('work-title').value) {
+    try {
+      const targetUrl = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
+      const proxyRes = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
+      if (proxyRes.ok) {
+        const html = await proxyRes.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const imgAlt = doc.querySelector('#list li .tmb img')?.getAttribute('alt') || doc.querySelector('.tmb a span.txt')?.textContent;
+        if (imgAlt) document.getElementById('work-title').value = imgAlt.trim();
+      }
+    } catch (e) {}
+  }
+
+  if (!document.getElementById('work-url').value) {
+    document.getElementById('work-url').value = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
+  }
+
+  if (foundImages.length > 0) {
+    document.getElementById('work-sample-urls').value = foundImages.join('\n');
+    renderUrlPreviewStrip();
+    statusEl.textContent = `取得完了：画像を ${foundImages.length}枚 検出しました（下にプレビュー表示）`;
+  } else {
+    statusEl.textContent = `自動検出できませんでした（手動でURLまたは写真を選択してください）`;
+  }
+  btn.disabled = false;
+}
+
+function renderUrlPreviewStrip() {
+  const urls = document.getElementById('work-sample-urls').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const strip = document.getElementById('autofetch-preview');
+  strip.innerHTML = urls.slice(0, 8).map(u => `<img src="${u}" referrerpolicy="no-referrer" alt="">`).join('');
+}
+
+/* =========================================================
+   Birthday & Age Helper
 ========================================================= */
 function calcAgeFromBirth(birthdate, fallbackAge) {
   if (birthdate) {
@@ -1116,22 +1463,14 @@ function calcAgeFromBirth(birthdate, fallbackAge) {
 
 function formatBirthDisplay(birthdate, fallbackAge) {
   const age = calcAgeFromBirth(birthdate, fallbackAge);
-  if (birthdate) {
-    const formatted = birthdate.replace(/-/g, '.');
-    return `${formatted} (${age}歳)`;
-  }
+  if (birthdate) return `${birthdate.replace(/-/g, '.')} (${age}歳)`;
   if (age) return `${age}歳`;
   return null;
 }
 
 function createPlaceholderSVG(title, sub = '') {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="440" viewBox="0 0 400 440">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#1a1610"/>
-        <stop offset="100%" stop-color="#070709"/>
-      </linearGradient>
-    </defs>
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1610"/><stop offset="100%" stop-color="#070709"/></linearGradient></defs>
     <rect width="400" height="440" fill="url(#g)"/>
     <rect x="18" y="18" width="364" height="404" fill="none" stroke="#cda861" stroke-width="1.5" opacity="0.45"/>
     <text x="200" y="210" fill="#f3dfb2" font-size="24" font-family="serif" text-anchor="middle">${title}</text>
@@ -1141,7 +1480,7 @@ function createPlaceholderSVG(title, sub = '') {
 }
 
 /* =========================================================
-   Navigation
+   Navigation & UI Rendering
 ========================================================= */
 function switchMainView(view) {
   ['roster', 'detail', 'analytics', 'calendar', 'settings'].forEach(v => {
@@ -1153,6 +1492,7 @@ function switchMainView(view) {
   });
 
   document.getElementById('btn-back').classList.add('hidden');
+  document.getElementById('sync-indicator').classList.remove('hidden');
   document.getElementById('btn-edit-actress').classList.add('hidden');
   document.getElementById('btn-top-action').classList.add('hidden');
 
@@ -1177,18 +1517,13 @@ function switchMainView(view) {
   } else if (view === 'settings') {
     document.getElementById('view-settings').classList.remove('hidden');
     document.getElementById('nav-settings').classList.add('active');
-    document.getElementById('header-title').textContent = '設定・保管庫';
+    document.getElementById('header-title').textContent = '設定・同期';
   }
   window.scrollTo(0, 0);
 }
 
-function showRoster() {
-  switchMainView('roster');
-}
+function showRoster() { switchMainView('roster'); }
 
-/* =========================================================
-   Roster View
-========================================================= */
 function renderTagFilterBar() {
   const allTags = new Set();
   state.actresses.forEach(a => (a.tags || []).forEach(t => allTags.add(t)));
@@ -1224,16 +1559,14 @@ function renderRoster() {
   const cupOrder = c => (c ? c.charCodeAt(0) : 0);
   if (sortMode === 'count') list.sort((a, b) => (b.count || 0) - (a.count || 0));
   if (sortMode === 'cup') list.sort((a, b) => cupOrder(b.cup) - cupOrder(a.cup));
-  if (sortMode === 'age') {
-    list.sort((a, b) => (calcAgeFromBirth(a.birthdate, a.age) || 99) - (calcAgeFromBirth(b.birthdate, b.age) || 99));
-  }
+  if (sortMode === 'age') list.sort((a, b) => (calcAgeFromBirth(a.birthdate, a.age) || 99) - (calcAgeFromBirth(b.birthdate, b.age) || 99));
   if (sortMode === 'new') list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
   const maxCount = Math.max(0, ...state.actresses.map(x => x.count || 0));
   const grid = document.getElementById('roster-grid');
 
   if (list.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">右上の「＋ 登録」から女優を追加してください</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">右上の「＋ 登録」から女優を追加するか、<br>「設定」からGitHubデータを読み込んでください</div>`;
     return;
   }
 
@@ -1243,7 +1576,7 @@ function renderRoster() {
       <div class="actress-card ${isTop ? 'top-fav' : ''}" onclick="openActressDetail('${a.id}')">
         <div class="card-inner">
           <div class="card-thumb-wrap">
-            <img src="${a.avatar || ''}" alt="${a.name}">
+            <img src="${a.avatar || ''}" alt="${a.name}" referrerpolicy="no-referrer">
             ${a.cup ? `<div class="card-cup-badge">${a.cup} cup</div>` : ''}
           </div>
           <div class="card-info">
@@ -1256,9 +1589,6 @@ function renderRoster() {
   }).join('');
 }
 
-/* =========================================================
-   Detail View (女優の個室: 左=作品一覧デフォルト, 右=フォルダ)
-========================================================= */
 function openActressDetail(actressId) {
   currentActressId = actressId;
   const a = state.actresses.find(x => x.id === actressId);
@@ -1269,6 +1599,7 @@ function openActressDetail(actressId) {
   });
   document.getElementById('view-detail').classList.remove('hidden');
   document.getElementById('btn-back').classList.remove('hidden');
+  document.getElementById('sync-indicator').classList.add('hidden');
   document.getElementById('btn-top-action').classList.add('hidden');
   document.getElementById('btn-edit-actress').classList.remove('hidden');
   document.getElementById('header-title').textContent = a.name;
@@ -1314,7 +1645,7 @@ function renderWorksList() {
     const sampleCount = w.images ? w.images.length : 0;
     return `
       <div class="work-card">
-        <img class="work-cover" src="${cover}" alt="" onclick="openWorkSamples('${w.id}')">
+        <img class="work-cover" src="${cover}" alt="" referrerpolicy="no-referrer" onclick="openWorkSamples('${w.id}')">
         <div class="work-info">
           <div>
             <div class="work-code">${w.code || ''}</div>
@@ -1341,141 +1672,14 @@ function renderFolderGrid() {
   }
   grid.innerHTML = items.map((m, idx) => `
     <div class="media-item" onclick="openFolderLightbox(${idx})">
-      <img src="${m.dataUrl}" alt="">
+      <img src="${m.dataUrl}" alt="" referrerpolicy="no-referrer">
       ${m.isGif ? `<span class="gif-badge">GIF</span>` : ''}
     </div>
   `).join('');
 }
 
 /* =========================================================
-   Product Code Auto-Fetch (品番からの自動画像＆タイトル取得)
-========================================================= */
-function buildDmmCandidateCidList(rawCode) {
-  const clean = rawCode.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-  const m = clean.match(/^([a-z]+)(\d+)$/);
-  if (!m) return [clean];
-  const prefix = m[1];
-  const num = m[2];
-  const pad3 = num.padStart(3, '0');
-  const pad5 = num.padStart(5, '0');
-  // プレステージ(abp, abf, sga等)やS1/Moodyz等の代表的なCIDパターンを網羅
-  return Array.from(new Set([
-    `${prefix}${pad3}`,
-    `${prefix}${pad5}`,
-    `118${prefix}${pad3}`,
-    `118${prefix}${pad5}`,
-    `1${prefix}${pad3}`,
-    `h_${prefix}${pad3}`
-  ]));
-}
-
-function probeImageExists(url, timeoutMs = 3500) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    let done = false;
-    const finish = (ok) => {
-      if (done) return;
-      done = true;
-      resolve(ok);
-    };
-    const timer = setTimeout(() => finish(false), timeoutMs);
-    img.onload = () => {
-      clearTimeout(timer);
-      // DMMの「Now Printing」ダミー画像(極小サイズ)を除外
-      if (img.naturalWidth > 130 && img.naturalHeight > 100) finish(true);
-      else finish(false);
-    };
-    img.onerror = () => { clearTimeout(timer); finish(false); };
-    img.src = url;
-  });
-}
-
-async function autoFetchByCode() {
-  const rawCode = document.getElementById('work-code').value.trim();
-  if (!rawCode) return alert('品番を入力してください（例：ABF-391）');
-
-  const statusEl = document.getElementById('autofetch-status');
-  const btn = document.getElementById('btn-autofetch');
-  btn.disabled = true;
-  statusEl.textContent = 'サーバーからパッケージ＆サンプル画像を探索中...';
-
-  const normalizedCode = rawCode.toUpperCase().replace(/\s+/g, '');
-  document.getElementById('work-code').value = normalizedCode;
-
-  const candidates = buildDmmCandidateCidList(normalizedCode);
-  let matchedCid = null;
-  let coverUrl = null;
-
-  // 1. パッケージ表紙画像をプローブ
-  for (const cid of candidates) {
-    const testCover = `https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`;
-    const ok = await probeImageExists(testCover);
-    if (ok) {
-      matchedCid = cid;
-      coverUrl = testCover;
-      break;
-    }
-    const testDigital = `https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`;
-    const okDig = await probeImageExists(testDigital);
-    if (okDig) {
-      matchedCid = cid;
-      coverUrl = testDigital;
-      break;
-    }
-  }
-
-  const foundImages = [];
-  if (coverUrl) foundImages.push(coverUrl);
-
-  // 2. サンプル画像(1〜15枚)を並列プローブ
-  if (matchedCid) {
-    const sampleChecks = [];
-    for (let i = 1; i <= 15; i++) {
-      const hiUrl = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}jp-${i}.jpg`;
-      sampleChecks.push(probeImageExists(hiUrl, 2800).then(ok => ok ? hiUrl : null));
-    }
-    const results = await Promise.all(sampleChecks);
-    results.filter(Boolean).forEach(u => foundImages.push(u));
-  }
-
-  // 3. タイトル取得（公開CORSプロキシ経由で試行）
-  let fetchedTitle = '';
-  try {
-    const searchUrl = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(searchUrl)}`;
-    const res = await fetch(proxyUrl);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.contents) {
-        const doc = new DOMParser().parseFromString(data.contents, 'text/html');
-        const tEl = doc.querySelector('.tmb a span.txt') || doc.querySelector('#list li .tmb img');
-        if (tEl) {
-          fetchedTitle = tEl.textContent || tEl.getAttribute('alt') || '';
-        }
-      }
-    }
-  } catch (e) {
-    // CORSブロック時はスキップ
-  }
-
-  if (fetchedTitle && !document.getElementById('work-title').value) {
-    document.getElementById('work-title').value = fetchedTitle.trim();
-  }
-  if (!document.getElementById('work-url').value) {
-    document.getElementById('work-url').value = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
-  }
-
-  if (foundImages.length > 0) {
-    document.getElementById('work-sample-urls').value = foundImages.join('\n');
-    statusEl.textContent = `取得成功：パッケージ＋サンプル画像 計${foundImages.length}枚を検出しました`;
-  } else {
-    statusEl.textContent = `自動検出できませんでした（手動で画像またはURLを追加できます）`;
-  }
-  btn.disabled = false;
-}
-
-/* =========================================================
-   Preference DNA Analytics (タグ・年齢・カップ数からの好み分析)
+   Preference DNA Analytics
 ========================================================= */
 function renderAnalytics() {
   const actresses = state.actresses;
@@ -1484,7 +1688,6 @@ function renderAnalytics() {
     return;
   }
 
-  // 重み計算：指名回数 + 1（登録自体を1ポイントとし、指名回数を強く反映）
   const cupScores = {};
   const ageBracketScores = { '18-21歳': 0, '22-25歳': 0, '26-29歳': 0, '30歳以上': 0 };
   const tagScores = {};
@@ -1496,9 +1699,7 @@ function renderAnalytics() {
     const w = (a.count || 0) + 1;
     totalWeight += (a.count || 0);
 
-    if (a.cup) {
-      cupScores[a.cup + 'カップ'] = (cupScores[a.cup + 'カップ'] || 0) + w;
-    }
+    if (a.cup) cupScores[a.cup + 'カップ'] = (cupScores[a.cup + 'カップ'] || 0) + w;
 
     const age = calcAgeFromBirth(a.birthdate, a.age);
     if (age) {
@@ -1666,7 +1867,7 @@ async function handleFolderUpload(e) {
   if (!files.length) return;
   for (const file of files) {
     const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
-    const dataUrl = await fileToDataUrl(file, isGif ? 0 : 960);
+    const dataUrl = await fileToDataUrl(file, isGif ? 0 : 860);
     state.media.unshift({
       id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
       actressId: currentActressId,
@@ -1677,7 +1878,7 @@ async function handleFolderUpload(e) {
   }
   await saveState();
   renderFolderGrid();
-  showToast(`${files.length}枚のメディアをフォルダに格納しました`);
+  showToast(`${files.length}枚のメディアを保存＆同期しました`);
   e.target.value = '';
 }
 
@@ -1726,9 +1927,7 @@ function showLightboxAt(idx) {
   document.getElementById('lightbox').classList.add('open');
 }
 
-function stepLightbox(dir) {
-  showLightboxAt(lightboxIndex + dir);
-}
+function stepLightbox(dir) { showLightboxAt(lightboxIndex + dir); }
 
 function toggleParapara(forceOn = false) {
   const btn = document.getElementById('btn-parapara');
@@ -1813,7 +2012,7 @@ function renderNextMatch() {
       document.getElementById('vs-grid').innerHTML = `
         <div style="grid-column:1/-1; max-width:190px; margin:0 auto;" class="actress-card top-fav" onclick="openActressDetail('${winner.id}')">
           <div class="card-inner">
-            <div class="card-thumb-wrap"><img src="${winner.avatar}"></div>
+            <div class="card-thumb-wrap"><img src="${winner.avatar}" referrerpolicy="no-referrer"></div>
             <div class="card-info">
               <div class="card-name">${winner.name}</div>
               <div class="card-count">タップして個室へ</div>
@@ -1834,7 +2033,7 @@ function renderNextMatch() {
     <div class="actress-card" onclick="pickVsWinner(${idx})">
       <div class="card-inner">
         <div class="card-thumb-wrap">
-          <img src="${a.avatar}">
+          <img src="${a.avatar}" referrerpolicy="no-referrer">
           ${a.cup ? `<div class="card-cup-badge">${a.cup} cup</div>` : ''}
         </div>
         <div class="card-info">
@@ -1882,9 +2081,7 @@ function openActressModal(actressId = null) {
   modal.classList.add('open');
 }
 
-function closeActressModal() {
-  document.getElementById('modal-actress').classList.remove('open');
-}
+function closeActressModal() { document.getElementById('modal-actress').classList.remove('open'); }
 
 async function saveActress() {
   const id = document.getElementById('edit-actress-id').value;
@@ -1901,7 +2098,7 @@ async function saveActress() {
   let avatarData = null;
 
   if (fileInput.files && fileInput.files[0]) {
-    avatarData = await fileToDataUrl(fileInput.files[0], 720);
+    avatarData = await fileToDataUrl(fileInput.files[0], 680);
   } else if (urlInput) {
     avatarData = urlInput;
   }
@@ -1952,12 +2149,11 @@ function openWorkModal() {
   document.getElementById('work-files').value = '';
   document.getElementById('work-sample-urls').value = '';
   document.getElementById('autofetch-status').textContent = '';
+  document.getElementById('autofetch-preview').innerHTML = '';
   document.getElementById('modal-work').classList.add('open');
 }
 
-function closeWorkModal() {
-  document.getElementById('modal-work').classList.remove('open');
-}
+function closeWorkModal() { document.getElementById('modal-work').classList.remove('open'); }
 
 async function saveWork() {
   const code = document.getElementById('work-code').value.trim().toUpperCase();
@@ -1972,7 +2168,7 @@ async function saveWork() {
 
   const files = Array.from(document.getElementById('work-files').files || []);
   for (const f of files) {
-    images.push(await fileToDataUrl(f, 900));
+    images.push(await fileToDataUrl(f, 860));
   }
 
   if (images.length === 0) {
@@ -2001,9 +2197,9 @@ async function deleteWork(workId) {
 }
 
 /* =========================================================
-   Utilities & Backup
+   Utilities & Init
 ========================================================= */
-function fileToDataUrl(file, maxWidth = 800) {
+function fileToDataUrl(file, maxWidth = 760) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -2019,7 +2215,7 @@ function fileToDataUrl(file, maxWidth = 800) {
         canvas.height = img.height * scale;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.86));
+        resolve(canvas.toDataURL('image/jpeg', 0.84));
       };
       img.src = e.target.result;
     };
@@ -2046,7 +2242,7 @@ function importDatabase(e) {
       if (imported && Array.isArray(imported.actresses)) {
         state = imported;
         await saveState();
-        showToast('データを復元しました');
+        showToast('データを復元＆クラウド同期しました');
         showRoster();
       }
     } catch (err) {
@@ -2059,7 +2255,10 @@ function importDatabase(e) {
 window.addEventListener('DOMContentLoaded', async () => {
   await initDB();
   await loadState();
+  detectGitHubRepo();
   renderRoster();
+  // 起動時にGitHub上のdata.jsonがあれば自動で最新状態を取得
+  await pullFromGitHub(false);
 });
 </script>
 </body>
