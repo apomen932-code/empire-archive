@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>帝国の名簿 - Private Archive</title>
+<style>
+  :root {
+    --bg-main: #070709;
+    --bg-card: #121216;
+    --bg-elevated: #1c1c24;
+    --gold: #d4af37;
+    --gold-light: #f3e5ab;
+    --gold-dim: rgba(212, 175, 55, 0.25);
+    --crimson: #9b111e;
+    --crimson-glow: rgba(220, 20, 60, 0.55);
+    --text-main: #f0ece1;
+    --text-sub: #9a968e;
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Mincho ProN", "Yu Mincho", serif;
+    overflow-x: hidden;
+    padding-bottom: calc(74px + var(--safe-bottom));
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(7, 7, 9, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--gold-dim);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    flex: 1;
+  }
+
+  .btn-icon {
+    background: var(--bg-elevated);
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-family: -apple-system, sans-serif;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-icon:active {
+    transform: scale(0.95);
+    background: var(--gold-dim);
+  }
+
+  /* Filter & Sort Bar */
+  .control-bar {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg-card);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-family: -apple-system, sans-serif;
+  }
+
+  .control-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  select, input[type="text"], input[type="number"], textarea {
+    background: var(--bg-elevated);
+    color: var(--text-main);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    outline: none;
+  }
+
+  .tag-scroll {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .tag-scroll::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    white-space: nowrap;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: var(--bg-elevated);
+    color: var(--text-sub);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+  }
+  .filter-chip.active {
+    background: linear-gradient(135deg, var(--crimson), #5a0811);
+    color: #fff;
+    border-color: var(--gold);
+  }
+
+  /* Roster Grid (3 columns like concept image) */
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .actress-card {
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid var(--gold-dim);
+    position: relative;
+    transition: transform 0.15s;
+    cursor: pointer;
+  }
+  .actress-card:active {
+    transform: scale(0.96);
+  }
+  /* Rank S (Top favorite) glow */
+  .actress-card.rank-s {
+    border-color: #ff2a4b;
+    box-shadow: 0 0 14px var(--crimson-glow);
+  }
+  .actress-card.rank-a {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.25);
+  }
+
+  .card-thumb-wrap {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: #1a1a22;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-thumb-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-cup-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(7, 7, 9, 0.78);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: -apple-system, sans-serif;
+  }
+
+  .card-rank-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: linear-gradient(135deg, var(--gold), #9c7a1c);
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: -apple-system, sans-serif;
+  }
+  .actress-card.rank-s .card-rank-badge {
+    background: linear-gradient(135deg, #ff2a4b, var(--crimson));
+    color: #fff;
+  }
+
+  .card-info {
+    padding: 7px 6px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(18,18,22,0.9), #0c0c10);
+  }
+  .card-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .card-count {
+    font-size: 0.72rem;
+    color: var(--gold);
+    font-family: -apple-system, sans-serif;
+  }
+
+  /* Detail View (Individual Room) */
+  .detail-profile {
+    padding: 16px;
+    background: radial-gradient(circle at top, rgba(155, 17, 30, 0.25), var(--bg-main) 75%);
+    border-bottom: 1px solid var(--gold-dim);
+  }
+
+  .profile-top {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .profile-avatar {
+    width: 96px;
+    height: 124px;
+    border-radius: 10px;
+    border: 2px solid var(--gold);
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  }
+
+  .profile-meta {
+    flex: 1;
+  }
+
+  .profile-name-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .profile-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--gold-light);
+  }
+
+  /* Spec & Attribute Badges */
+  .spec-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-family: -apple-system, sans-serif;
+  }
+  .spec-pill {
+    background: rgba(212, 175, 55, 0.14);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .attr-pill {
+    background: var(--bg-elevated);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-main);
+    font-size: 0.73rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .nominate-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 11px;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--crimson), #590710);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--crimson-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .nominate-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Detail Sub-Tabs (Left: Works default, Right: Folder) */
+  .sub-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gold-dim);
+    background: var(--bg-card);
+  }
+  .sub-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-sub);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+  }
+  .sub-tab.active {
+    color: var(--gold-light);
+    background: linear-gradient(180deg, transparent, rgba(212, 175, 55, 0.15));
+    border-bottom-color: var(--gold);
+  }
+
+  /* Works List */
+  .works-list {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .work-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gold-dim);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .work-header {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  .work-cover {
+    width: 110px;
+    height: 76px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #222;
+    flex-shrink: 0;
+  }
+  .work-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .work-code {
+    font-size: 0.72rem;
+    color: var(--gold);
+    font-family: monospace;
+  }
+  .work-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .work-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    font-family: -apple-system, sans-serif;
+  }
+  .btn-mini {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    border-radius: 5px;
+    border: 1px solid var(--gold-dim);
+    background: var(--bg-elevated);
+    color: var(--gold-light);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Media Folder Grid (4 columns like concept image) */
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 14px;
+  }
+  .media-item {
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--gold-dim);
+    position: relative;
+    background: #16161d;
+    cursor: pointer;
+  }
+  .media-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gif-badge {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-size: 0.62rem;
+    font-family: sans-serif;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  /* Bottom Navigation */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: rgba(10, 10, 14, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--gold-dim);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 calc(8px + var(--safe-bottom));
+    font-family: -apple-system, sans-serif;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--text-sub);
+    font-size: 0.7rem;
+    cursor: pointer;
+    flex: 1;
+  }
+  .nav-item.active {
+    color: var(--gold);
+  }
+  .nav-icon {
+    font-size: 1.25rem;
+  }
+
+  /* Arena (Gacha & 1v1 Tournament) */
+  .arena-wrap {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .arena-box {
+    background: var(--bg-card);
+    border: 1px solid var(--gold-dim);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .gacha-stage {
+    margin: 14px auto;
+    width: 210px;
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    border: 2px solid var(--gold);
+    overflow: hidden;
+    position: relative;
+    background: #0c0c10;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+    cursor: pointer;
+  }
+  .gacha-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s ease;
+  }
+  /* Silhouette / Mosaic state before reveal */
+  .gacha-stage.concealed img {
+    filter: blur(18px) brightness(0.25) contrast(2.2);
+    transform: scale(1.12);
+  }
+  .gacha-overlay-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+    color: var(--gold-light);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+  }
+
+  .vs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  /* Heatmap Calendar */
+  .calendar-wrap {
+    padding: 16px;
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+    font-family: -apple-system, sans-serif;
+  }
+  .cal-day-header {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    padding-bottom: 4px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    position: relative;
+    cursor: pointer;
+  }
+  .cal-cell.heat-1 { background: rgba(155, 17, 30, 0.38); border-color: var(--crimson); }
+  .cal-cell.heat-2 { background: rgba(190, 20, 40, 0.68); border-color: #ff4d6d; }
+  .cal-cell.heat-3 { background: linear-gradient(135deg, #ff1e42, var(--gold)); color: #000; font-weight: 800; box-shadow: 0 0 10px var(--crimson-glow); }
+
+  /* Fullscreen Lightbox & Parapara Viewer */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.96);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 96vw;
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  .lightbox-controls {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+  }
+
+  /* Modal Forms */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(0,0,0,0.82);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: -apple-system, sans-serif;
+  }
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--gold-light);
+  }
+  .hidden { display: none !important; }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    top: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--gold), #b38728);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 18px;
+    border-radius: 999px;
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    font-family: -apple-system, sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div id="toast">🔥 今夜の指名を記録しました</div>
+
+<!-- Top Header -->
+<header>
+  <button id="btn-back" class="btn-icon hidden" onclick="showRoster()">＜ 戻る</button>
+  <div id="header-title" class="header-title">帝国の名簿</div>
+  <button id="btn-top-action" class="btn-icon" onclick="openActressModal()">＋ 登録</button>
+</header>
+
+<!-- VIEW 1: ROSTER (名簿ホーム) -->
+<section id="view-roster">
+  <div class="control-bar">
+    <div class="control-top">
+      <select id="sort-select" onchange="renderRoster()">
+        <option value="count">🔥 指名回数順（寵愛順）</option>
+        <option value="cup">💎 カップ数順</option>
+        <option value="age">🌱 年齢が若い順</option>
+        <option value="new">✨ 新規登録順</option>
+      </select>
+      <input type="text" id="search-input" placeholder="名前・タグで検索..." oninput="renderRoster()" style="flex:1;">
+    </div>
+    <div id="tag-filter-bar" class="tag-scroll"></div>
+  </div>
+
+  <div id="roster-grid" class="roster-grid"></div>
+</section>
+
+<!-- VIEW 2: ACTRESS DETAIL (女優の個室) -->
+<section id="view-detail" class="hidden">
+  <div class="detail-profile">
+    <div class="profile-top">
+      <img id="detail-avatar" class="profile-avatar" src="" alt="">
+      <div class="profile-meta">
+        <div class="profile-name-row">
+          <div id="detail-name" class="profile-name"></div>
+          <button class="btn-mini" onclick="openActressModal(currentActressId)">編集</button>
+        </div>
+        <!-- 画面上部に常駐する属性（年齢・カップ数・タグ） -->
+        <div id="detail-specs" class="spec-badges"></div>
+        <div style="font-size:0.78rem; color:var(--text-sub); font-family:sans-serif;">
+          累計指名: <strong id="detail-count" style="color:var(--gold);">0</strong>回 ／ ランク: <strong id="detail-rank" style="color:#ff4d6d;">S</strong>
+        </div>
+      </div>
+    </div>
+    <button class="nominate-btn" onclick="nominateActress(currentActressId)">
+      🔥 今夜この子を指名する（寵愛カウント＋1）
+    </button>
+  </div>
+
+  <!-- 左：作品・サンプル一覧（デフォルト） ／ 右：フォルダ（写真・GIF） -->
+  <div class="sub-tabs">
+    <div id="subtab-works" class="sub-tab active" onclick="switchDetailTab('works')">🎬 作品・サンプル一覧</div>
+    <div id="subtab-folder" class="sub-tab" onclick="switchDetailTab('folder')">📂 フォルダ (写真/GIF)</div>
+  </div>
+
+  <!-- Tab Content A: Works List (Default) -->
+  <div id="detail-works-pane">
+    <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:0.8rem; color:var(--text-sub);">登録作品リスト</span>
+      <button class="btn-icon" onclick="openWorkModal()">＋ 作品を追加</button>
+    </div>
+    <div id="works-list" class="works-list"></div>
+  </div>
+
+  <!-- Tab Content B: Photo & GIF Folder -->
+  <div id="detail-folder-pane" class="hidden">
+    <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <label class="btn-icon" style="flex:1; text-align:center; display:block;">
+        📥 写真・GIFをフォルダに追加 (複数可)
+        <input type="file" accept="image/*" multiple style="display:none;" onchange="handleFolderUpload(event)">
+      </label>
+      <button class="btn-icon" onclick="promptMediaUrl()">🔗 URL追加</button>
+    </div>
+    <div id="folder-grid" class="folder-grid"></div>
+  </div>
+</section>
+
+<!-- VIEW 3: ARENA (迷った時のSSRガチャ ＆ 2択バトル) -->
+<section id="view-arena" class="hidden">
+  <div class="arena-wrap">
+    <!-- Gacha Box -->
+    <div class="arena-box">
+      <div style="color:var(--gold); font-weight:700; font-size:1.05rem;">🎰 SSR確定・今夜の運命召喚</div>
+      <p style="font-size:0.75rem; color:var(--text-sub); margin-top:4px;">シルエットをタップして高画質ビジュアルを解禁</p>
+      <div id="gacha-stage" class="gacha-stage concealed" onclick="revealGacha()">
+        <img id="gacha-img" src="" alt="">
+        <div id="gacha-overlay" class="gacha-overlay-text">
+          <span style="font-size:1.8rem;">🔒</span>
+          <span>TAP TO UNLOCK</span>
+        </div>
+      </div>
+      <div id="gacha-result-name" style="font-weight:700; font-size:1.1rem; min-height:1.5em; color:var(--gold-light);">???</div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+        <button class="btn-icon" onclick="rollGacha()">🔄 別の子を召喚</button>
+        <button id="gacha-go-btn" class="btn-icon hidden" style="background:var(--crimson); color:#fff;" onclick="goToGachaActress()">🚪 個室へ行く</button>
+      </div>
+    </div>
+
+    <!-- 1v1 Tournament Box -->
+    <div class="arena-box">
+      <div style="color:var(--gold); font-weight:700; font-size:1.05rem;">⚔️ 直感2択・今夜のワールドカップ</div>
+      <p id="vs-round-label" style="font-size:0.75rem; color:var(--text-sub); margin-top:4px;">今の気分で直感タップ！勝ち抜きで今夜の1人を決定</p>
+      <div id="vs-grid" class="vs-grid"></div>
+      <button class="btn-icon" style="margin-top:12px;" onclick="startTournament()">🔥 トーナメント開始 / リセット</button>
+    </div>
+  </div>
+</section>
+
+<!-- VIEW 4: CALENDAR (背徳のヒートマップ履歴) -->
+<section id="view-calendar" class="hidden">
+  <div class="calendar-wrap">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <button class="btn-icon" onclick="changeMonth(-1)">◀ 前月</button>
+      <div id="cal-month-label" style="font-weight:700; color:var(--gold-light); font-size:1.1rem;"></div>
+      <button class="btn-icon" onclick="changeMonth(1)">次月 ▶</button>
+    </div>
+    <div id="cal-grid" class="cal-grid"></div>
+
+    <div class="arena-box" style="margin-top:16px; text-align:left;">
+      <div style="font-size:0.9rem; color:var(--gold); font-weight:700; margin-bottom:6px;">📊 今月の欲望スタッツ</div>
+      <div id="cal-stats" style="font-size:0.82rem; line-height:1.7; font-family:sans-serif;"></div>
+    </div>
+
+    <div id="cal-day-detail" class="arena-box hidden" style="margin-top:12px; text-align:left;"></div>
+  </div>
+</section>
+
+<!-- VIEW 5: SETTINGS (バックアップ・データ管理) -->
+<section id="view-settings" class="hidden">
+  <div class="arena-wrap" style="font-family:sans-serif;">
+    <div class="arena-box" style="text-align:left; display:flex; flex-direction:column; gap:10px;">
+      <div style="color:var(--gold); font-weight:700;">💾 データのバックアップ・復元</div>
+      <p style="font-size:0.78rem; color:var(--text-sub);">ブラウザのキャッシュ消去に備えて、JSONファイルとして書き出し・読み込みが可能です。</p>
+      <button class="btn-icon" onclick="exportDatabase()">📤 データを書き出す (JSON保存)</button>
+      <label class="btn-icon" style="text-align:center;">
+        📥 データを読み込む (復元)
+        <input type="file" accept=".json" style="display:none;" onchange="importDatabase(event)">
+      </label>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX (全画面ビュー ＆ サンプル画像パラパラ再生) -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+  <img id="lightbox-img" src="" alt="">
+  <div id="lightbox-caption" style="color:var(--gold-light); font-size:0.85rem; margin-top:8px; font-family:sans-serif;"></div>
+  <div class="lightbox-controls" onclick="event.stopPropagation()">
+    <button class="btn-icon" onclick="stepLightbox(-1)">◀ 前へ</button>
+    <button id="btn-parapara" class="btn-icon" onclick="toggleParapara()">🎞️ パラパラ再生: OFF</button>
+    <button class="btn-icon" onclick="stepLightbox(1)">次へ ▶</button>
+    <button class="btn-icon" style="border-color:var(--crimson); color:#ff6b81;" onclick="deleteCurrentMedia()">🗑️ 削除</button>
+    <button class="btn-icon" onclick="closeLightbox(null, true)">✕ 閉じる</button>
+  </div>
+</div>
+
+<!-- MODAL: ACTRESS ADD/EDIT -->
+<div id="modal-actress" class="modal-backdrop">
+  <div class="modal-card">
+    <div style="font-weight:700; color:var(--gold); font-size:1rem;">👑 女優プロフィールの登録・編集</div>
+    <input type="hidden" id="edit-actress-id">
+    <div class="form-row">
+      <label>女優名 *</label>
+      <input type="text" id="act-name" placeholder="例：涼森れむ">
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+      <div class="form-row">
+        <label>年齢</label>
+        <input type="number" id="act-age" placeholder="26">
+      </div>
+      <div class="form-row">
+        <label>カップ数</label>
+        <input type="text" id="act-cup" placeholder="F">
+      </div>
+      <div class="form-row">
+        <label>身長(cm)</label>
+        <input type="number" id="act-height" placeholder="160">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>属性タグ（カンマ区切り）</label>
+      <input type="text" id="act-tags" placeholder="透明感, スレンダー, 美巨乳, 清楚系">
+    </div>
+    <div class="form-row">
+      <label>プロフィール写真（カメラロールから選択 または 画像URL）</label>
+      <input type="file" id="act-file" accept="image/*">
+      <input type="text" id="act-img-url" placeholder="https://... (画像URLでも可)">
+    </div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-icon" style="flex:1; background:var(--gold); color:#000; font-weight:700;" onclick="saveActress()">保存する</button>
+      <button id="btn-delete-actress" class="btn-icon hidden" style="border-color:var(--crimson); color:#ff6b81;" onclick="deleteActress()">削除</button>
+      <button class="btn-icon" onclick="closeActressModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: WORK ADD -->
+<div id="modal-work" class="modal-backdrop">
+  <div class="modal-card">
+    <div style="font-weight:700; color:var(--gold); font-size:1rem;">🎬 作品・サンプル画像の登録</div>
+    <div class="form-row">
+      <label>品番（入力するとFANZA等のサンプル画像も管理しやすくなります）</label>
+      <input type="text" id="work-code" placeholder="例：ABP-987 / SONE-123">
+    </div>
+    <div class="form-row">
+      <label>作品タイトル *</label>
+      <input type="text" id="work-title" placeholder="作品タイトルやシチュエーション名">
+    </div>
+    <div class="form-row">
+      <label>ブラウザ視聴ページURL（Safariで1タップ起動用）</label>
+      <input type="text" id="work-url" placeholder="https://...">
+    </div>
+    <div class="form-row">
+      <label>パッケージ画像 ＆ サンプル画像（複数ファイル選択可）</label>
+      <input type="file" id="work-files" accept="image/*" multiple>
+      <textarea id="work-sample-urls" rows="3" placeholder="または画像URLを改行区切りでペースト（1行目が表紙、2行目以降がサンプル画像になります）"></textarea>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-icon" style="flex:1; background:var(--gold); color:#000; font-weight:700;" onclick="saveWork()">作品を追加</button>
+      <button class="btn-icon" onclick="closeWorkModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav">
+  <div id="nav-roster" class="nav-item active" onclick="switchMainView('roster')">
+    <span class="nav-icon">👑</span>
+    <span>名簿</span>
+  </div>
+  <div id="nav-arena" class="nav-item" onclick="switchMainView('arena')">
+    <span class="nav-icon">🎰</span>
+    <span>闘技場・召喚</span>
+  </div>
+  <div id="nav-calendar" class="nav-item" onclick="switchMainView('calendar')">
+    <span class="nav-icon">📅</span>
+    <span>履歴</span>
+  </div>
+  <div id="nav-settings" class="nav-item" onclick="switchMainView('settings')">
+    <span class="nav-icon">⚙️</span>
+    <span>設定</span>
+  </div>
+</nav>
+
+<script>
+/* =========================================================
+   IndexedDB Wrapper (写真・GIFを大容量で保存するためのDB)
+========================================================= */
+const DB_NAME = 'EmpireArchiveDB';
+const DB_VERSION = 1;
+let db;
+
+let state = {
+  actresses: [],
+  works: [],      // { id, actressId, code, title, url, images: [] }
+  media: [],      // { id, actressId, dataUrl, isGif, createdAt }
+  logs: []        // { dateStr: 'YYYY-MM-DD', actressId, timestamp }
+};
+
+let currentActressId = null;
+let activeTagFilter = null;
+let currentCalDate = new Date();
+
+// Lightbox & Parapara state
+let lightboxList = [];
+let lightboxIndex = 0;
+let paraparaTimer = null;
+
+// Gacha & Tournament state
+let currentGachaActressId = null;
+let tournamentPool = [];
+let tournamentNext = [];
+
+function initDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('kv')) {
+        d.createObjectStore('kv');
+      }
+    };
+    req.onsuccess = (e) => {
+      db = e.target.result;
+      resolve();
+    };
+    req.onerror = (e) => reject(e);
+  });
+}
+
+function saveState() {
+  return new Promise((resolve) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(state, 'appState');
+    tx.oncomplete = () => resolve();
+  });
+}
+
+function loadState() {
+  return new Promise((resolve) => {
+    const tx = db.transaction('kv', 'readonly');
+    const req = tx.objectStore('kv').get('appState');
+    req.onsuccess = () => {
+      if (req.result) {
+        state = req.result;
+      } else {
+        seedInitialData();
+      }
+      resolve();
+    };
+  });
+}
+
+// 初回起動時に雰囲気がすぐ分かるサンプルデータを投入
+function seedInitialData() {
+  const sampleImg1 = createPlaceholderSVG('奈川 美子', '#9b111e', '#d4af37', 'F cup / 24歳');
+  const sampleImg2 = createPlaceholderSVG('女川 美子', '#1f2430', '#d4af37', 'G cup / 22歳');
+  const sampleImg3 = createPlaceholderSVG('香谷 美子', '#2b192e', '#d4af37', 'E cup / 25歳');
+
+  const id1 = 'act_1', id2 = 'act_2', id3 = 'act_3';
+  state.actresses = [
+    { id: id1, name: '奈川 美子', age: 24, cup: 'F', height: 162, tags: ['透明感', '美巨乳', 'スレンダー'], avatar: sampleImg1, count: 80, createdAt: Date.now() - 300000 },
+    { id: id2, name: '女川 美子', age: 22, cup: 'G', height: 158, tags: ['清楚系', 'もち肌', 'お姉さん'], avatar: sampleImg2, count: 42, createdAt: Date.now() - 200000 },
+    { id: id3, name: '香谷 美子', age: 25, cup: 'E', height: 165, tags: ['クール', '長身', '痴女系'], avatar: sampleImg3, count: 34, createdAt: Date.now() - 100000 }
+  ];
+
+  state.works = [
+    {
+      id: 'w_1',
+      actressId: id1,
+      code: 'EMP-001',
+      title: '極上の密室ドキュメント 完全主観スペシャル',
+      url: 'https://www.dmm.co.jp/',
+      images: [
+        createPlaceholderSVG('SAMPLE SCENE 1', '#3a0ca3', '#f3e5ab', '00:15:20 導入'),
+        createPlaceholderSVG('SAMPLE SCENE 2', '#7209b7', '#f3e5ab', '00:45:10 衣装チェンジ'),
+        createPlaceholderSVG('SAMPLE SCENE 3', '#b5179e', '#f3e5ab', '01:25:00 クライマックス')
+      ]
+    }
+  ];
+
+  state.media = [
+    { id: 'm_1', actressId: id1, dataUrl: sampleImg1, isGif: false, createdAt: Date.now() },
+    { id: 'm_2', actressId: id1, dataUrl: createPlaceholderSVG('SECRET GIF', '#590710', '#d4af37', '動くGIFプレビュー'), isGif: true, createdAt: Date.now() }
+  ];
+
+  const todayStr = formatDate(new Date());
+  state.logs = [
+    { dateStr: todayStr, actressId: id1, timestamp: Date.now() }
+  ];
+  saveState();
+}
+
+function createPlaceholderSVG(title, bg1, accent, sub) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="520" viewBox="0 0 400 520">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${bg1}"/>
+        <stop offset="100%" stop-color="#070709"/>
+      </linearGradient>
+    </defs>
+    <rect width="400" height="520" fill="url(#g)"/>
+    <rect x="16" y="16" width="368" height="488" fill="none" stroke="${accent}" stroke-width="2" opacity="0.5"/>
+    <text x="200" y="240" fill="${accent}" font-size="28" font-family="serif" font-weight="bold" text-anchor="middle">${title}</text>
+    <text x="200" y="285" fill="#f0ece1" font-size="18" font-family="sans-serif" text-anchor="middle" opacity="0.8">${sub}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+/* =========================================================
+   Navigation & View Switching
+========================================================= */
+function switchMainView(view) {
+  ['roster', 'detail', 'arena', 'calendar', 'settings'].forEach(v => {
+    document.getElementById('view-' + v).classList.add('hidden');
+  });
+  ['roster', 'arena', 'calendar', 'settings'].forEach(n => {
+    const el = document.getElementById('nav-' + n);
+    if (el) el.classList.remove('active');
+  });
+
+  document.getElementById('btn-back').classList.add('hidden');
+  document.getElementById('btn-top-action').classList.remove('hidden');
+
+  if (view === 'roster') {
+    document.getElementById('view-roster').classList.remove('hidden');
+    document.getElementById('nav-roster').classList.add('active');
+    document.getElementById('header-title').textContent = '帝国の名簿';
+    renderRoster();
+  } else if (view === 'arena') {
+    document.getElementById('view-arena').classList.remove('hidden');
+    document.getElementById('nav-arena').classList.add('active');
+    document.getElementById('header-title').textContent = '闘技場・SSR召喚';
+    document.getElementById('btn-top-action').classList.add('hidden');
+    rollGacha();
+    if (tournamentPool.length === 0) startTournament();
+  } else if (view === 'calendar') {
+    document.getElementById('view-calendar').classList.remove('hidden');
+    document.getElementById('nav-calendar').classList.add('active');
+    document.getElementById('header-title').textContent = '背徳の履歴';
+    document.getElementById('btn-top-action').classList.add('hidden');
+    renderCalendar();
+  } else if (view === 'settings') {
+    document.getElementById('view-settings').classList.remove('hidden');
+    document.getElementById('nav-settings').classList.add('active');
+    document.getElementById('header-title').textContent = '設定・保管庫';
+    document.getElementById('btn-top-action').classList.add('hidden');
+  }
+  window.scrollTo(0, 0);
+}
+
+function showRoster() {
+  switchMainView('roster');
+}
+
+/* =========================================================
+   Roster Rendering & Filtering
+========================================================= */
+function getRank(count) {
+  if (count >= 50) return 'S';
+  if (count >= 20) return 'A';
+  if (count >= 5) return 'B';
+  return 'C';
+}
+
+function renderTagFilterBar() {
+  const allTags = new Set();
+  state.actresses.forEach(a => (a.tags || []).forEach(t => allTags.add(t)));
+  const bar = document.getElementById('tag-filter-bar');
+  let html = `<div class="filter-chip ${!activeTagFilter ? 'active' : ''}" onclick="setTagFilter(null)">すべて (${state.actresses.length})</div>`;
+  allTags.forEach(tag => {
+    const isAct = activeTagFilter === tag ? 'active' : '';
+    html += `<div class="filter-chip ${isAct}" onclick="setTagFilter('${tag}')">#${tag}</div>`;
+  });
+  bar.innerHTML = html;
+}
+
+function setTagFilter(tag) {
+  activeTagFilter = tag;
+  renderRoster();
+}
+
+function renderRoster() {
+  renderTagFilterBar();
+  const sortMode = document.getElementById('sort-select').value;
+  const query = document.getElementById('search-input').value.trim().toLowerCase();
+
+  let list = state.actresses.filter(a => {
+    if (activeTagFilter && !(a.tags || []).includes(activeTagFilter)) return false;
+    if (query) {
+      const inName = a.name.toLowerCase().includes(query);
+      const inTags = (a.tags || []).some(t => t.toLowerCase().includes(query));
+      return inName || inTags;
+    }
+    return true;
+  });
+
+  const cupOrder = c => (c ? c.charCodeAt(0) : 0);
+  if (sortMode === 'count') list.sort((a, b) => (b.count || 0) - (a.count || 0));
+  if (sortMode === 'cup') list.sort((a, b) => cupOrder(b.cup) - cupOrder(a.cup));
+  if (sortMode === 'age') list.sort((a, b) => (a.age || 99) - (b.age || 99));
+  if (sortMode === 'new') list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  const grid = document.getElementById('roster-grid');
+  grid.innerHTML = list.map(a => {
+    const rank = getRank(a.count || 0);
+    const rankClass = rank === 'S' ? 'rank-s' : (rank === 'A' ? 'rank-a' : '');
+    return `
+      <div class="actress-card ${rankClass}" onclick="openActressDetail('${a.id}')">
+        <div class="card-thumb-wrap">
+          <img src="${a.avatar || ''}" alt="${a.name}">
+          <div class="card-rank-badge">${rank}</div>
+          ${a.cup ? `<div class="card-cup-badge">${a.cup} cup</div>` : ''}
+        </div>
+        <div class="card-info">
+          <div class="card-name">${a.name}</div>
+          <div class="card-count">指名回数 🔥 ${a.count || 0}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =========================================================
+   Detail View (女優の個室: 左=作品一覧デフォルト, 右=フォルダ)
+========================================================= */
+function openActressDetail(actressId) {
+  currentActressId = actressId;
+  const a = state.actresses.find(x => x.id === actressId);
+  if (!a) return;
+
+  ['roster', 'arena', 'calendar', 'settings'].forEach(v => {
+    document.getElementById('view-' + v).classList.add('hidden');
+  });
+  document.getElementById('view-detail').classList.remove('hidden');
+  document.getElementById('btn-back').classList.remove('hidden');
+  document.getElementById('btn-top-action').classList.add('hidden');
+  document.getElementById('header-title').textContent = a.name;
+
+  document.getElementById('detail-avatar').src = a.avatar || '';
+  document.getElementById('detail-name').textContent = a.name;
+  document.getElementById('detail-count').textContent = a.count || 0;
+  document.getElementById('detail-rank').textContent = getRank(a.count || 0);
+
+  // 画面上部に常駐する属性・スペックバッジ
+  let specsHtml = '';
+  if (a.age) specsHtml += `<span class="spec-pill">${a.age}歳</span>`;
+  if (a.cup) specsHtml += `<span class="spec-pill">${a.cup}カップ</span>`;
+  if (a.height) specsHtml += `<span class="spec-pill">${a.height}cm</span>`;
+  (a.tags || []).forEach(t => {
+    specsHtml += `<span class="attr-pill">#${t}</span>`;
+  });
+  document.getElementById('detail-specs').innerHTML = specsHtml;
+
+  // ご要望通り、デフォルトは左側の「作品一覧」タブを表示
+  switchDetailTab('works');
+  window.scrollTo(0, 0);
+}
+
+function switchDetailTab(tab) {
+  const isWorks = tab === 'works';
+  document.getElementById('subtab-works').classList.toggle('active', isWorks);
+  document.getElementById('subtab-folder').classList.toggle('active', !isWorks);
+  document.getElementById('detail-works-pane').classList.toggle('hidden', !isWorks);
+  document.getElementById('detail-folder-pane').classList.toggle('hidden', isWorks);
+
+  if (isWorks) {
+    renderWorksList();
+  } else {
+    renderFolderGrid();
+  }
+}
+
+function renderWorksList() {
+  const works = state.works.filter(w => w.actressId === currentActressId);
+  const container = document.getElementById('works-list');
+  if (works.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:var(--text-sub); padding:28px 0; font-size:0.85rem;">まだ作品が登録されていません。「＋ 作品を追加」から登録できます。</div>`;
+    return;
+  }
+
+  container.innerHTML = works.map(w => {
+    const cover = (w.images && w.images[0]) ? w.images[0] : '';
+    const sampleCount = w.images ? w.images.length : 0;
+    return `
+      <div class="work-card">
+        <div class="work-header" onclick="openWorkSamples('${w.id}')">
+          <img class="work-cover" src="${cover}" alt="">
+          <div class="work-info">
+            <div>
+              <div class="work-code">${w.code || 'NO CODE'}</div>
+              <div class="work-title">${w.title}</div>
+            </div>
+            <div class="work-actions" onclick="event.stopPropagation()">
+              <button class="btn-mini" onclick="openWorkSamples('${w.id}')">🖼️ サンプル (${sampleCount}枚)</button>
+              <button class="btn-mini" onclick="openWorkSamples('${w.id}', true)">🎞️ パラパラ再生</button>
+              ${w.url ? `<a class="btn-mini" href="${w.url}" target="_blank" onclick="nominateActress('${currentActressId}', true)">🌐 Safariで視聴</a>` : ''}
+              <button class="btn-mini" style="color:#ff6b81;" onclick="deleteWork('${w.id}')">削除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderFolderGrid() {
+  const items = state.media.filter(m => m.actressId === currentActressId);
+  const grid = document.getElementById('folder-grid');
+  if (items.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-sub); padding:28px 0; font-size:0.85rem;">この子の専用フォルダはまだ空です。<br>上のボタンから写真や動くGIFを追加できます。</div>`;
+    return;
+  }
+  grid.innerHTML = items.map((m, idx) => `
+    <div class="media-item" onclick="openFolderLightbox(${idx})">
+      <img src="${m.dataUrl}" alt="">
+      ${m.isGif ? `<span class="gif-badge">GIF</span>` : ''}
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   Nomination (指名カウント ＆ 背徳カレンダー自動記録)
+========================================================= */
+function nominateActress(actressId, silent = false) {
+  const a = state.actresses.find(x => x.id === actressId);
+  if (!a) return;
+  a.count = (a.count || 0) + 1;
+
+  const todayStr = formatDate(new Date());
+  state.logs.push({
+    dateStr: todayStr,
+    actressId: actressId,
+    timestamp: Date.now()
+  });
+
+  saveState();
+  if (currentActressId === actressId) {
+    document.getElementById('detail-count').textContent = a.count;
+    document.getElementById('detail-rank').textContent = getRank(a.count);
+  }
+  if (!silent) showToast(`🔥 ${a.name} を指名しました (計${a.count}回)`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2200);
+}
+
+/* =========================================================
+   Folder Upload & Lightbox / Parapara Viewer
+========================================================= */
+async function handleFolderUpload(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  for (const file of files) {
+    const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
+    const dataUrl = await fileToDataUrl(file, isGif ? 0 : 960);
+    state.media.unshift({
+      id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      actressId: currentActressId,
+      dataUrl,
+      isGif,
+      createdAt: Date.now()
+    });
+  }
+  await saveState();
+  renderFolderGrid();
+  showToast(`📂 ${files.length}枚のメディアをフォルダに保存しました`);
+  e.target.value = '';
+}
+
+function promptMediaUrl() {
+  const url = prompt('追加したい画像またはGIFのURLを入力してください:');
+  if (!url) return;
+  const isGif = url.toLowerCase().includes('.gif');
+  state.media.unshift({
+    id: 'm_' + Date.now(),
+    actressId: currentActressId,
+    dataUrl: url.trim(),
+    isGif,
+    createdAt: Date.now()
+  });
+  saveState();
+  renderFolderGrid();
+}
+
+function openFolderLightbox(index) {
+  const items = state.media.filter(m => m.actressId === currentActressId);
+  lightboxList = items.map(m => ({ src: m.dataUrl, id: m.id, type: 'media', label: '📂 専用フォルダ保管メディア' }));
+  lightboxIndex = index;
+  showLightboxAt(lightboxIndex);
+}
+
+function openWorkSamples(workId, autoParapara = false) {
+  const w = state.works.find(x => x.id === workId);
+  if (!w || !w.images || !w.images.length) return;
+  lightboxList = w.images.map((src, i) => ({
+    src,
+    id: workId,
+    type: 'work',
+    label: `🎬 ${w.title} (${i + 1}/${w.images.length})`
+  }));
+  lightboxIndex = 0;
+  showLightboxAt(0);
+  if (autoParapara) toggleParapara(true);
+}
+
+function showLightboxAt(idx) {
+  if (!lightboxList.length) return;
+  lightboxIndex = (idx + lightboxList.length) % lightboxList.length;
+  const item = lightboxList[lightboxIndex];
+  document.getElementById('lightbox-img').src = item.src;
+  document.getElementById('lightbox-caption').textContent = item.label;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function stepLightbox(dir) {
+  showLightboxAt(lightboxIndex + dir);
+}
+
+function toggleParapara(forceOn = false) {
+  const btn = document.getElementById('btn-parapara');
+  if (paraparaTimer && !forceOn) {
+    clearInterval(paraparaTimer);
+    paraparaTimer = null;
+    btn.textContent = '🎞️ パラパラ再生: OFF';
+  } else {
+    if (paraparaTimer) clearInterval(paraparaTimer);
+    paraparaTimer = setInterval(() => {
+      stepLightbox(1);
+    }, 650);
+    btn.textContent = '🎞️ パラパラ再生: ON 🔥';
+  }
+}
+
+function deleteCurrentMedia() {
+  const current = lightboxList[lightboxIndex];
+  if (!current || current.type !== 'media') {
+    alert('作品サンプルは作品一覧から削除できます。');
+    return;
+  }
+  if (!confirm('この画像/GIFをフォルダから削除しますか？')) return;
+  state.media = state.media.filter(m => m.id !== current.id);
+  saveState();
+  closeLightbox(null, true);
+  renderFolderGrid();
+}
+
+function closeLightbox(e, force = false) {
+  if (!force && e && e.target.id !== 'lightbox') return;
+  if (paraparaTimer) {
+    clearInterval(paraparaTimer);
+    paraparaTimer = null;
+    document.getElementById('btn-parapara').textContent = '🎞️ パラパラ再生: OFF';
+  }
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+/* =========================================================
+   Arena: SSR Gacha (モザイク解除演出) & 1v1 Tournament
+========================================================= */
+function rollGacha() {
+  if (!state.actresses.length) return;
+  const stage = document.getElementById('gacha-stage');
+  stage.classList.add('concealed');
+  document.getElementById('gacha-overlay').classList.remove('hidden');
+  document.getElementById('gacha-result-name').textContent = '??? (タップでヴェールを解除)';
+  document.getElementById('gacha-go-btn').classList.add('hidden');
+
+  const pick = state.actresses[Math.floor(Math.random() * state.actresses.length)];
+  currentGachaActressId = pick.id;
+  document.getElementById('gacha-img').src = pick.avatar || '';
+}
+
+function revealGacha() {
+  const a = state.actresses.find(x => x.id === currentGachaActressId);
+  if (!a) return;
+  document.getElementById('gacha-stage').classList.remove('concealed');
+  document.getElementById('gacha-overlay').classList.add('hidden');
+  document.getElementById('gacha-result-name').textContent = `👑 SSR降臨：${a.name} (${a.cup || '?'} cup)`;
+  document.getElementById('gacha-go-btn').classList.remove('hidden');
+}
+
+function goToGachaActress() {
+  if (currentGachaActressId) openActressDetail(currentGachaActressId);
+}
+
+function startTournament() {
+  if (state.actresses.length < 2) {
+    document.getElementById('vs-grid').innerHTML = `<div style="grid-column:1/-1; color:var(--text-sub); font-size:0.8rem;">2人以上登録すると2択バトルが遊べます</div>`;
+    return;
+  }
+  tournamentPool = [...state.actresses].sort(() => Math.random() - 0.5);
+  tournamentNext = [];
+  renderNextMatch();
+}
+
+function renderNextMatch() {
+  if (tournamentPool.length < 2) {
+    if (tournamentPool.length === 1) tournamentNext.push(tournamentPool[0]);
+    if (tournamentNext.length === 1) {
+      const winner = tournamentNext[0];
+      document.getElementById('vs-round-label').textContent = `🏆 今夜の優勝決定！！`;
+      document.getElementById('vs-grid').innerHTML = `
+        <div style="grid-column:1/-1; max-width:200px; margin:0 auto;" class="actress-card rank-s" onclick="openActressDetail('${winner.id}')">
+          <div class="card-thumb-wrap"><img src="${winner.avatar}"></div>
+          <div class="card-info">
+            <div class="card-name">👑 ${winner.name}</div>
+            <div class="card-count">タップして個室へ</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    tournamentPool = tournamentNext;
+    tournamentNext = [];
+  }
+
+  const left = tournamentPool[0];
+  const right = tournamentPool[1];
+  document.getElementById('vs-round-label').textContent = `残り ${tournamentPool.length + tournamentNext.length}人 — 直感で選んでください`;
+  document.getElementById('vs-grid').innerHTML = [left, right].map((a, idx) => `
+    <div class="actress-card rank-a" onclick="pickVsWinner(${idx})">
+      <div class="card-thumb-wrap">
+        <img src="${a.avatar}">
+        ${a.cup ? `<div class="card-cup-badge">${a.cup} cup</div>` : ''}
+      </div>
+      <div class="card-info">
+        <div class="card-name">${a.name}</div>
+        <div class="card-count">🔥 ${a.count || 0}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function pickVsWinner(idx) {
+  const winner = tournamentPool[idx];
+  tournamentNext.push(winner);
+  tournamentPool.splice(0, 2);
+  renderNextMatch();
+}
+
+/* =========================================================
+   Heatmap Calendar (背徳の足跡)
+========================================================= */
+function formatDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function changeMonth(delta) {
+  currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const year = currentCalDate.getFullYear();
+  const month = currentCalDate.getMonth();
+  document.getElementById('cal-month-label').textContent = `${year}年 ${month + 1}月`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+  const monthLogs = state.logs.filter(l => l.dateStr.startsWith(monthPrefix));
+  const dayCounts = {};
+  const actressCounts = {};
+
+  monthLogs.forEach(l => {
+    dayCounts[l.dateStr] = (dayCounts[l.dateStr] || 0) + 1;
+    actressCounts[l.actressId] = (actressCounts[l.actressId] || 0) + 1;
+  });
+
+  const grid = document.getElementById('cal-grid');
+  const headers = ['日', '月', '火', '水', '木', '金', '土'].map(d => `<div class="cal-day-header">${d}</div>`).join('');
+  let cells = '';
+
+  for (let i = 0; i < firstDay; i++) {
+    cells += `<div></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dStr = `${monthPrefix}-${String(d).padStart(2, '0')}`;
+    const c = dayCounts[dStr] || 0;
+    let heatClass = '';
+    if (c === 1) heatClass = 'heat-1';
+    else if (c === 2) heatClass = 'heat-2';
+    else if (c >= 3) heatClass = 'heat-3';
+
+    cells += `
+      <div class="cal-cell ${heatClass}" onclick="showDayLog('${dStr}')">
+        <span>${d}</span>
+        ${c > 0 ? `<span style="font-size:0.6rem;">🔥${c}</span>` : ''}
+      </div>
+    `;
+  }
+  grid.innerHTML = headers + cells;
+
+  // Monthly top actress
+  let topActressText = '記録なし';
+  const sortedAct = Object.entries(actressCounts).sort((a, b) => b[1] - a[1]);
+  if (sortedAct.length > 0) {
+    const topObj = state.actresses.find(x => x.id === sortedAct[0][0]);
+    if (topObj) topActressText = `${topObj.name} (${sortedAct[0][1]}回)`;
+  }
+
+  document.getElementById('cal-stats').innerHTML = `
+    ・今月の総指名回数：<strong>${monthLogs.length}回</strong><br>
+    ・今月の最愛（最多指名）：<strong>👑 ${topActressText}</strong>
+  `;
+}
+
+function showDayLog(dateStr) {
+  const logs = state.logs.filter(l => l.dateStr === dateStr);
+  const box = document.getElementById('cal-day-detail');
+  box.classList.remove('hidden');
+  if (!logs.length) {
+    box.innerHTML = `<div style="color:var(--text-sub); font-size:0.8rem;">${dateStr} の記録はありません</div>`;
+    return;
+  }
+  const names = logs.map(l => {
+    const a = state.actresses.find(x => x.id === l.actressId);
+    return a ? `🔥 ${a.name}` : '不明';
+  }).join(' ／ ');
+  box.innerHTML = `<div style="color:var(--gold); font-weight:700; font-size:0.85rem; margin-bottom:4px;">📅 ${dateStr} の指名履歴 (${logs.length}回)</div><div style="font-size:0.85rem;">${names}</div>`;
+}
+
+/* =========================================================
+   Add / Edit Modals
+========================================================= */
+function openActressModal(actressId = null) {
+  const modal = document.getElementById('modal-actress');
+  const delBtn = document.getElementById('btn-delete-actress');
+  if (actressId) {
+    const a = state.actresses.find(x => x.id === actressId);
+    document.getElementById('edit-actress-id').value = a.id;
+    document.getElementById('act-name').value = a.name;
+    document.getElementById('act-age').value = a.age || '';
+    document.getElementById('act-cup').value = a.cup || '';
+    document.getElementById('act-height').value = a.height || '';
+    document.getElementById('act-tags').value = (a.tags || []).join(', ');
+    document.getElementById('act-img-url').value = '';
+    delBtn.classList.remove('hidden');
+  } else {
+    document.getElementById('edit-actress-id').value = '';
+    document.getElementById('act-name').value = '';
+    document.getElementById('act-age').value = '';
+    document.getElementById('act-cup').value = '';
+    document.getElementById('act-height').value = '';
+    document.getElementById('act-tags').value = '';
+    document.getElementById('act-img-url').value = '';
+    delBtn.classList.add('hidden');
+  }
+  document.getElementById('act-file').value = '';
+  modal.classList.add('open');
+}
+
+function closeActressModal() {
+  document.getElementById('modal-actress').classList.remove('open');
+}
+
+async function saveActress() {
+  const id = document.getElementById('edit-actress-id').value;
+  const name = document.getElementById('act-name').value.trim();
+  if (!name) return alert('女優名を入力してください');
+
+  const age = parseInt(document.getElementById('act-age').value) || null;
+  const cup = document.getElementById('act-cup').value.trim().toUpperCase();
+  const height = parseInt(document.getElementById('act-height').value) || null;
+  const tags = document.getElementById('act-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+
+  const fileInput = document.getElementById('act-file');
+  const urlInput = document.getElementById('act-img-url').value.trim();
+  let avatarData = null;
+
+  if (fileInput.files && fileInput.files[0]) {
+    avatarData = await fileToDataUrl(fileInput.files[0], 700);
+  } else if (urlInput) {
+    avatarData = urlInput;
+  }
+
+  if (id) {
+    const a = state.actresses.find(x => x.id === id);
+    a.name = name;
+    a.age = age;
+    a.cup = cup;
+    a.height = height;
+    a.tags = tags;
+    if (avatarData) a.avatar = avatarData;
+  } else {
+    const newId = 'act_' + Date.now();
+    state.actresses.unshift({
+      id: newId,
+      name,
+      age,
+      cup,
+      height,
+      tags,
+      avatar: avatarData || createPlaceholderSVG(name, '#590710', '#d4af37', `${cup || '?'} cup`),
+      count: 0,
+      createdAt: Date.now()
+    });
+  }
+
+  await saveState();
+  closeActressModal();
+  if (currentActressId && id === currentActressId) {
+    openActressDetail(currentActressId);
+  } else {
+    renderRoster();
+  }
+}
+
+async function deleteActress() {
+  const id = document.getElementById('edit-actress-id').value;
+  if (!id || !confirm('この女優データと紐づく作品・フォルダをすべて削除しますか？')) return;
+  state.actresses = state.actresses.filter(x => x.id !== id);
+  state.works = state.works.filter(w => w.actressId !== id);
+  state.media = state.media.filter(m => m.actressId !== id);
+  await saveState();
+  closeActressModal();
+  showRoster();
+}
+
+function openWorkModal() {
+  document.getElementById('work-code').value = '';
+  document.getElementById('work-title').value = '';
+  document.getElementById('work-url').value = '';
+  document.getElementById('work-files').value = '';
+  document.getElementById('work-sample-urls').value = '';
+  document.getElementById('modal-work').classList.add('open');
+}
+
+function closeWorkModal() {
+  document.getElementById('modal-work').classList.remove('open');
+}
+
+async function saveWork() {
+  const code = document.getElementById('work-code').value.trim().toUpperCase();
+  const title = document.getElementById('work-title').value.trim();
+  const url = document.getElementById('work-url').value.trim();
+  if (!title) return alert('作品タイトルを入力してください');
+
+  const images = [];
+  const files = Array.from(document.getElementById('work-files').files || []);
+  for (const f of files) {
+    images.push(await fileToDataUrl(f, 900));
+  }
+
+  const urlsText = document.getElementById('work-sample-urls').value.trim();
+  if (urlsText) {
+    urlsText.split('\n').map(s => s.trim()).filter(Boolean).forEach(u => images.push(u));
+  }
+
+  if (images.length === 0) {
+    images.push(createPlaceholderSVG(code || 'WORK', '#2b192e', '#d4af37', title.slice(0, 14)));
+  }
+
+  state.works.unshift({
+    id: 'w_' + Date.now(),
+    actressId: currentActressId,
+    code,
+    title,
+    url,
+    images
+  });
+
+  await saveState();
+  closeWorkModal();
+  renderWorksList();
+}
+
+async function deleteWork(workId) {
+  if (!confirm('この作品を削除しますか？')) return;
+  state.works = state.works.filter(w => w.id !== workId);
+  await saveState();
+  renderWorksList();
+}
+
+/* =========================================================
+   Image Utilities & Backup Export/Import
+========================================================= */
+function fileToDataUrl(file, maxWidth = 800) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (!maxWidth || file.type === 'image/gif') {
+        resolve(e.target.result);
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function exportDatabase() {
+  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `empire_backup_${formatDate(new Date())}.json`;
+  a.click();
+}
+
+function importDatabase(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (imported && Array.isArray(imported.actresses)) {
+        state = imported;
+        await saveState();
+        alert('データを復元しました！');
+        showRoster();
+      }
+    } catch (err) {
+      alert('JSONファイルの読み込みに失敗しました');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// 起動処理
+window.addEventListener('DOMContentLoaded', async () => {
+  await initDB();
+  await loadState();
+  renderRoster();
+});
+</script>
+</body>
+</html>
