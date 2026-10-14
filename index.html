@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<!-- 外部画像サーバー(DMM/Prestige等)の直リンク拒否(403エラー)を回避する設定 -->
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,6 +21,7 @@
     --gold-glow: rgba(205, 168, 97, 0.22);
     --text-main: #eee7d7;
     --text-sub: #968c79;
+    --safe-top: env(safe-area-inset-top, 16px);
     --safe-bottom: env(safe-area-inset-bottom, 20px);
   }
 
@@ -69,7 +69,7 @@
   }
 
   .header-side {
-    width: 88px;
+    width: 92px;
     display: flex;
     align-items: center;
   }
@@ -293,6 +293,7 @@
     background: #09090b;
     box-shadow: 0 8px 26px rgba(0,0,0,0.85), 0 0 18px rgba(205, 168, 97, 0.2);
     margin-bottom: 14px;
+    cursor: pointer;
   }
   .portrait-frame img {
     width: 100%;
@@ -652,31 +653,78 @@
   .nav-item.active { color: var(--gold-bright); }
   .nav-item.active .svg-icon { filter: drop-shadow(0 0 6px rgba(243, 223, 178, 0.7)); }
 
-  /* Lightbox */
+  /* =========================================================
+     IMMERSIVE FULLSCREEN LIGHTBOX (Pinch Zoom, Swipe, Tap HUD Toggle)
+  ========================================================= */
   .lightbox {
     position: fixed;
     inset: 0;
-    z-index: 200;
-    background: rgba(3, 3, 4, 0.96);
+    z-index: 500;
+    background: #000;
     display: none;
-    flex-direction: column;
+    overflow: hidden;
+    touch-action: none;
+  }
+  .lightbox.open { display: block; }
+
+  .lightbox-stage {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #lightbox-img {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .lightbox-hud-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: calc(12px + var(--safe-top)) 16px 16px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.82) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 510;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .lightbox-hud-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 16px calc(18px + var(--safe-bottom));
+    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+    display: flex;
     justify-content: center;
     align-items: center;
+    gap: 12px;
+    z-index: 510;
+    transition: opacity 0.25s ease, transform 0.25s ease;
   }
-  .lightbox.open { display: flex; }
-  .lightbox img {
-    max-width: 96vw;
-    max-height: 76vh;
-    object-fit: contain;
-    border: 1px solid var(--gold-border);
-    border-radius: 4px;
+
+  .lightbox.hud-hidden .lightbox-hud-top {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
   }
-  .lightbox-controls {
-    margin-top: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+  .lightbox.hud-hidden .lightbox-hud-bottom {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
   }
 
   /* Modals */
@@ -741,7 +789,7 @@
     font-size: 0.78rem;
     padding: 8px 18px;
     border-radius: 4px;
-    z-index: 300;
+    z-index: 600;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s;
@@ -790,7 +838,7 @@
 <!-- VIEW 2: ACTRESS DETAIL -->
 <section id="view-detail" class="hidden">
   <div class="detail-hero">
-    <div class="portrait-frame">
+    <div class="portrait-frame" onclick="openPortraitFullscreen()">
       <img id="detail-avatar" src="" alt="" referrerpolicy="no-referrer">
     </div>
     <div id="detail-specs" class="spec-badges"></div>
@@ -898,28 +946,28 @@
   </div>
 </section>
 
-<!-- VIEW 5: SETTINGS (GitHub Cloud Auto-Sync) -->
+<!-- VIEW 5: SETTINGS (Private Vault Sync) -->
 <section id="view-settings" class="hidden">
   <div class="section-wrap" style="font-family:-apple-system, sans-serif;">
     <div class="lux-panel" style="display:flex; flex-direction:column; gap:10px;">
-      <div class="panel-title" style="font-family:serif;"><span>GitHub クラウド自動同期（別端末・シークレット対応）</span></div>
+      <div class="panel-title" style="font-family:serif;"><span>秘密の金庫（empire-vault）自動同期</span></div>
       <p style="font-size:0.74rem; color:var(--text-sub); line-height:1.5;">
-        GitHubのPersonal Access Token（repo権限）を設定すると、データを追加・指名するたびにあなたのリポジトリ内の <code>data.json</code> へ自動保存され、プライベートブラウズや別端末でも常に同じデータが同期されます。
+        非公開リポジトリ <code>empire-vault</code> に全データを暗号化通信で自動保存します。プライベートブラウズや別端末でもトークンを入れるだけで即座に同期されます。
       </p>
       <div class="form-row">
-        <label>GitHub ユーザー名 / リポジトリ名（自動検出済）</label>
+        <label>GitHub オーナー名 ／ 非公開リポジトリ名</label>
         <div style="display:flex; gap:6px;">
           <input type="text" id="gh-owner" placeholder="apomen932-code" style="flex:1;">
-          <input type="text" id="gh-repo" placeholder="リポジトリ名" style="flex:1;">
+          <input type="text" id="gh-repo" value="empire-vault" placeholder="empire-vault" style="flex:1;">
         </div>
       </div>
       <div class="form-row">
-        <label>GitHub Personal Access Token (ghp_...)</label>
-        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <label>Personal Access Token (ghp_...)</label>
+        <input type="password" id="gh-token" placeholder="コピーしたトークンをここに貼り付け">
       </div>
       <div style="display:flex; gap:8px; margin-top:4px;">
-        <button class="btn-gold solid" style="flex:1;" onclick="saveGitHubConfigAndSync()">保存して今すぐ同期</button>
-        <button class="btn-gold" onclick="pullFromGitHub(true)">GitHubから強制読込</button>
+        <button class="btn-gold solid" style="flex:1;" onclick="saveGitHubConfigAndSync()">保存して同期開始</button>
+        <button class="btn-gold" onclick="pullFromGitHub(true)">金庫から強制読込</button>
       </div>
       <div id="gh-sync-log" style="font-size:0.72rem; color:var(--gold-main); margin-top:4px;"></div>
     </div>
@@ -935,16 +983,21 @@
   </div>
 </section>
 
-<!-- LIGHTBOX -->
-<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
-  <img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer">
-  <div id="lightbox-caption" style="color:var(--gold-bright); font-size:0.82rem; margin-top:10px; letter-spacing:0.05em;"></div>
-  <div class="lightbox-controls" onclick="event.stopPropagation()">
-    <button class="btn-gold" onclick="stepLightbox(-1)">前へ</button>
+<!-- IMMERSIVE FULLSCREEN LIGHTBOX (1タップでメニュー非表示・スワイプ切替・ピンチ拡大) -->
+<div id="lightbox" class="lightbox">
+  <div class="lightbox-hud-top" onclick="event.stopPropagation()">
+    <div id="lightbox-caption" style="color:var(--gold-bright); font-size:0.8rem; font-family:sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75vw;"></div>
+    <button class="btn-gold" onclick="closeLightbox(null, true)">✕ 閉じる</button>
+  </div>
+
+  <div id="lightbox-stage" class="lightbox-stage">
+    <img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer">
+  </div>
+
+  <div class="lightbox-hud-bottom" onclick="event.stopPropagation()">
+    <button class="btn-gold" onclick="resetZoom()">等倍リセット</button>
     <button id="btn-parapara" class="btn-gold" onclick="toggleParapara()">パラパラ再生: OFF</button>
-    <button class="btn-gold" onclick="stepLightbox(1)">次へ</button>
-    <button class="btn-gold" onclick="deleteCurrentMedia()">削除</button>
-    <button class="btn-gold" onclick="closeLightbox(null, true)">閉じる</button>
+    <button id="btn-lightbox-del" class="btn-gold" onclick="deleteCurrentMedia()">削除</button>
   </div>
 </div>
 
@@ -988,7 +1041,7 @@
   </div>
 </div>
 
-<!-- MODAL: WORK ADD (高精度自動取得) -->
+<!-- MODAL: WORK ADD -->
 <div id="modal-work" class="modal-backdrop">
   <div class="modal-card">
     <div class="panel-title"><span>作品・サンプル画像の登録</span></div>
@@ -1046,7 +1099,7 @@
 
 <script>
 /* =========================================================
-   IndexedDB & GitHub Cloud Sync Engine
+   IndexedDB & Private Vault GitHub Sync Engine
 ========================================================= */
 const DB_NAME = 'EmpireArchiveDB';
 const DB_VERSION = 1;
@@ -1107,23 +1160,19 @@ function loadState() {
   });
 }
 
-/* --- GitHub Auto-Detect & Cloud Sync --- */
 function detectGitHubRepo() {
   const savedOwner = localStorage.getItem('gh_owner');
   const savedRepo = localStorage.getItem('gh_repo');
   const savedToken = localStorage.getItem('gh_token') || '';
 
   let defaultOwner = 'apomen932-code';
-  let defaultRepo = '';
-
   if (location.hostname.endsWith('.github.io')) {
     defaultOwner = location.hostname.replace('.github.io', '');
-    const pathParts = location.pathname.split('/').filter(Boolean);
-    defaultRepo = pathParts.length > 0 ? pathParts[0] : `${defaultOwner}.github.io`;
   }
 
   document.getElementById('gh-owner').value = savedOwner || defaultOwner;
-  document.getElementById('gh-repo').value = savedRepo || defaultRepo;
+  // 非公開の秘密の金庫「empire-vault」をデフォルトに設定
+  document.getElementById('gh-repo').value = savedRepo || 'empire-vault';
   document.getElementById('gh-token').value = savedToken;
   updateSyncBadge(savedToken ? 'online' : 'offline');
 }
@@ -1134,7 +1183,7 @@ function updateSyncBadge(status, text) {
   dot.className = 'sync-dot';
   if (status === 'online') {
     dot.classList.add('online');
-    label.textContent = text || 'GitHub同期済';
+    label.textContent = text || '金庫同期済';
   } else if (status === 'syncing') {
     dot.classList.add('syncing');
     label.textContent = text || '同期中...';
@@ -1153,8 +1202,7 @@ async function saveGitHubConfigAndSync() {
   localStorage.setItem('gh_repo', repo);
   localStorage.setItem('gh_token', token);
 
-  document.getElementById('gh-sync-log').textContent = 'GitHubリポジトリと通信中...';
-  // ローカルが空（プライベートブラウズ等）ならGitHubから読み込み、データがあればプッシュ
+  document.getElementById('gh-sync-log').textContent = '非公開リポジトリ (empire-vault) と通信中...';
   if (state.actresses.length === 0) {
     const pulled = await pullFromGitHub(true);
     if (!pulled) await pushToGitHub();
@@ -1166,9 +1214,9 @@ async function saveGitHubConfigAndSync() {
 function scheduleCloudPush() {
   const token = localStorage.getItem('gh_token');
   if (!token) return;
-  updateSyncBadge('syncing', '保存予約...');
+  updateSyncBadge('syncing', '保存待機...');
   if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => { pushToGitHub(); }, 1200);
+  syncTimer = setTimeout(() => { pushToGitHub(); }, 1000);
 }
 
 function utf8ToBase64(str) {
@@ -1193,17 +1241,18 @@ async function pullFromGitHub(manual = false) {
   const repo = localStorage.getItem('gh_repo') || document.getElementById('gh-repo').value.trim();
   const token = localStorage.getItem('gh_token') || document.getElementById('gh-token').value.trim();
 
-  if (!owner || !repo) return false;
-  updateSyncBadge('syncing', 'クラウド読込中');
+  if (!owner || !repo || !token) return false;
+  updateSyncBadge('syncing', '金庫読込中');
 
   try {
-    const headers = { 'Accept': 'application/vnd.github.v3+json' };
-    if (token) headers['Authorization'] = `token ${token}`;
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json'
+    };
 
     const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data.json?t=${Date.now()}`, { headers });
     if (!res.ok) {
-      if (manual) document.getElementById('gh-sync-log').textContent = 'GitHub上にまだ data.json がありません。現在のデータを新規保存します。';
-      updateSyncBadge(token ? 'online' : 'offline', '待機中');
+      updateSyncBadge('online', '初回待機');
       return false;
     }
     const fileData = await res.json();
@@ -1212,9 +1261,10 @@ async function pullFromGitHub(manual = false) {
     let jsonStr = '';
     if (fileData.content) {
       jsonStr = base64ToUtf8(fileData.content);
-    } else if (fileData.download_url) {
-      const rawRes = await fetch(fileData.download_url + `?t=${Date.now()}`);
-      jsonStr = await rawRes.text();
+    } else if (fileData.git_url) {
+      const blobRes = await fetch(fileData.git_url, { headers });
+      const blobData = await blobRes.json();
+      jsonStr = base64ToUtf8(blobData.content);
     }
 
     const remoteState = JSON.parse(jsonStr);
@@ -1223,15 +1273,15 @@ async function pullFromGitHub(manual = false) {
         state = remoteState;
         await saveState(true);
         renderRoster();
-        if (manual) showToast('GitHubから最新データを復元しました');
+        if (manual) showToast('秘密の金庫から最新データを復元しました');
       }
     }
-    updateSyncBadge('online', 'GitHub同期済');
-    if (manual) document.getElementById('gh-sync-log').textContent = `最終同期完了: ${new Date().toLocaleTimeString()}`;
+    updateSyncBadge('online', '金庫同期済');
+    const logEl = document.getElementById('gh-sync-log');
+    if (logEl) logEl.textContent = `同期完了: ${new Date().toLocaleTimeString()}`;
     return true;
   } catch (e) {
     updateSyncBadge('offline', '読込エラー');
-    if (manual) document.getElementById('gh-sync-log').textContent = '読込エラー: ' + e.message;
     return false;
   }
 }
@@ -1242,7 +1292,7 @@ async function pushToGitHub() {
   const token = localStorage.getItem('gh_token');
   if (!owner || !repo || !token) return;
 
-  updateSyncBadge('syncing', 'GitHub保存中...');
+  updateSyncBadge('syncing', '金庫保存中');
   try {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/data.json`;
     const headers = {
@@ -1260,7 +1310,7 @@ async function pushToGitHub() {
     }
 
     const body = {
-      message: `Auto-sync archive data (${new Date().toLocaleString('ja-JP')})`,
+      message: `Sync vault (${new Date().toLocaleString('ja-JP')})`,
       content: utf8ToBase64(JSON.stringify(state))
     };
     if (ghFileSha) body.sha = ghFileSha;
@@ -1275,30 +1325,29 @@ async function pushToGitHub() {
     const putData = await putRes.json();
     ghFileSha = putData.content.sha;
 
-    updateSyncBadge('online', 'GitHub保存済');
+    updateSyncBadge('online', '金庫保存済');
     const logEl = document.getElementById('gh-sync-log');
-    if (logEl) logEl.textContent = `GitHubへ自動保存完了 (${new Date().toLocaleTimeString()})`;
+    if (logEl) logEl.textContent = `empire-vault へ自動保存完了 (${new Date().toLocaleTimeString()})`;
   } catch (e) {
-    updateSyncBadge('offline', '同期失敗');
+    updateSyncBadge('offline', '保存失敗');
     const logEl = document.getElementById('gh-sync-log');
-    if (logEl) logEl.textContent = `保存エラー（トークン権限等を確認してください）: ${e.message}`;
+    if (logEl) logEl.textContent = `保存エラー: ${e.message}`;
   }
 }
 
 /* =========================================================
-   Product Code Auto-Fetch (改良版: リファラー回避 + 複数CDN & メタデータ検索)
+   Product Code Auto-Fetch (表紙確実化 ＆ 3段階タイトル取得)
 ========================================================= */
 function buildCandidateUrls(rawCode) {
   const clean = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
   const m = clean.match(/^([A-Z]+)(\d+)$/);
-  if (!m) return { code: clean, covers: [], samplePatterns: [] };
+  if (!m) return { code: clean, cids: [], covers: [] };
 
   const prefix = m[1].toLowerCase();
   const num = m[2];
   const pad3 = num.padStart(3, '0');
   const pad5 = num.padStart(5, '0');
 
-  // Prestige系メーカープレフィックス判定
   const prestigePrefixes = ['abf', 'abp', 'abw', 'abs', 'sga', 'chn', 'onez', 'ama', 'bgn', 'docp', 'mgt', 'esk', 'kbi', 'tre'];
   const isPrestige = prestigePrefixes.includes(prefix);
 
@@ -1309,22 +1358,10 @@ function buildCandidateUrls(rawCode) {
     cids.push(`${prefix}${pad5}`, `${prefix}${pad3}`, `1${prefix}${pad3}`, `1${prefix}${pad5}`, `118${prefix}${pad3}`, `h_${prefix}${pad3}`);
   }
 
-  const covers = [];
-  // Prestige公式CDN
-  if (isPrestige) {
-    covers.push(`https://www.prestige-av.com/api/media/goods/prestige/${prefix}/${pad3}/pb_${prefix}-${pad3}.jpg`);
-    covers.push(`https://www.prestige-av.com/ images/corner/goods/prestige/${prefix}/${pad3}/pb_${prefix}-${pad3}.jpg`.replace(' ', ''));
-  }
-  // DMM CDN (digital & mono)
-  cids.forEach(cid => {
-    covers.push(`https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`);
-    covers.push(`https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`);
-  });
-
-  return { prefix, pad3, cids, isPrestige, covers };
+  return { prefix, pad3, cids, isPrestige };
 }
 
-function probeImageNoReferrer(url, timeoutMs = 4000) {
+function probeImageNoReferrer(url, timeoutMs = 3800) {
   return new Promise((resolve) => {
     const img = new Image();
     img.referrerPolicy = 'no-referrer';
@@ -1333,13 +1370,60 @@ function probeImageNoReferrer(url, timeoutMs = 4000) {
     const timer = setTimeout(() => finish(false), timeoutMs);
     img.onload = () => {
       clearTimeout(timer);
-      // DMMのダミー画像(Now Printing: 100x75等)を除外
-      if (img.naturalWidth > 140 && img.naturalHeight > 105) finish(true);
+      if (img.naturalWidth > 110 && img.naturalHeight > 90) finish(true);
       else finish(false);
     };
     img.onerror = () => { clearTimeout(timer); finish(false); };
     img.src = url;
   });
+}
+
+async function fetchTitleMultiRoute(normalizedCode, matchedCid) {
+  const cleanTitle = (raw) => {
+    if (!raw) return '';
+    return raw
+      .replace(/ - アダルト動画.*$/i, '')
+      .replace(/ \| アダルト動画.*$/i, '')
+      .replace(/ - DMM.*$/i, '')
+      .replace(/ - FANZA.*$/i, '')
+      .replace(/【FANZA.*】/g, '')
+      .replace(/^\s*\[[^\]]+\]\s*/, '')
+      .trim();
+  };
+
+  // Route 1: DuckDuckGo HTML Search (年齢確認ゲートをバイパスしてタイトル取得)
+  try {
+    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(normalizedCode + ' FANZA OR プレステージ')}`;
+    const res1 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(ddgUrl)}`);
+    if (res1.ok) {
+      const html = await res1.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const links = Array.from(doc.querySelectorAll('.result__a'));
+      for (const a of links) {
+        const txt = a.textContent || '';
+        if (txt.toUpperCase().includes(normalizedCode) || txt.length > 8) {
+          const cleaned = cleanTitle(txt);
+          if (cleaned && !cleaned.includes('検索結果')) return cleaned;
+        }
+      }
+    }
+  } catch (e) {}
+
+  // Route 2: codetabs proxy で直接作品ページまたは検索結果の og:title を取得
+  if (matchedCid) {
+    try {
+      const detailUrl = `https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=${matchedCid}/`;
+      const res2 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(detailUrl)}`);
+      if (res2.ok) {
+        const html = await res2.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const og = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || doc.querySelector('#title')?.textContent;
+        if (og && !og.includes('年齢認証')) return cleanTitle(og);
+      }
+    } catch (e) {}
+  }
+
+  return '';
 }
 
 async function autoFetchByCode() {
@@ -1349,42 +1433,54 @@ async function autoFetchByCode() {
   const statusEl = document.getElementById('autofetch-status');
   const btn = document.getElementById('btn-autofetch');
   btn.disabled = true;
-  statusEl.textContent = '複数サーバーからパッケージ・サンプル画像を探索中...';
+  statusEl.textContent = '表紙・サンプル画像・タイトルを自動検索中...';
 
   const m = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').match(/^([A-Z]+)(\d+)$/);
   const normalizedCode = m ? `${m[1]}-${m[2].padStart(3, '0')}` : rawCode.toUpperCase();
   document.getElementById('work-code').value = normalizedCode;
 
   const info = buildCandidateUrls(normalizedCode);
-  const foundImages = [];
-
-  // 1. パッケージ画像を検出
   let matchedCid = null;
-  for (const cUrl of info.covers) {
-    const ok = await probeImageNoReferrer(cUrl, 3200);
-    if (ok) {
-      foundImages.push(cUrl);
-      const cidMatch = cUrl.match(/\/(?:video|adult)\/([^\/]+)\//);
-      if (cidMatch) matchedCid = cidMatch[1];
-      break;
-    }
-  }
 
-  // もしカバーがまだ未確定なら全CID候補でサンプル1枚目をテストしてCIDを特定
-  if (!matchedCid && info.cids) {
-    for (const cid of info.cids) {
-      const testSample = `https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-1.jpg`;
-      if (await probeImageNoReferrer(testSample, 2500)) {
+  // 1. まずサンプル1枚目または表紙から確実なCIDを特定
+  for (const cid of info.cids) {
+    const testUrls = [
+      `https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-1.jpg`,
+      `https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`,
+      `https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`
+    ];
+    for (const tu of testUrls) {
+      if (await probeImageNoReferrer(tu, 2600)) {
         matchedCid = cid;
         break;
       }
     }
+    if (matchedCid) break;
   }
 
-  // 2. サンプル画像を並列プローブ (jp-1 〜 jp-12 および -1 〜 -12)
+  const foundImages = [];
+
+  // 2. CIDが特定できたら、必ず「表紙パッケージ画像」を1枚目に確保！
   if (matchedCid) {
+    const coverCandidates = [
+      `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}pl.jpg`,
+      `https://pics.dmm.co.jp/mono/movie/adult/${matchedCid}/${matchedCid}pl.jpg`,
+      `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}ps.jpg`,
+      `https://pics.dmm.co.jp/mono/movie/adult/${matchedCid}/${matchedCid}ps.jpg`
+    ];
+    if (info.isPrestige) {
+      coverCandidates.unshift(`https://www.prestige-av.com/api/media/goods/prestige/${info.prefix}/${info.pad3}/pb_${info.prefix}-${info.pad3}.jpg`);
+    }
+    for (const cUrl of coverCandidates) {
+      if (await probeImageNoReferrer(cUrl, 2800)) {
+        foundImages.push(cUrl);
+        break;
+      }
+    }
+
+    // 3. サンプル画像 (1〜15枚) を並列取得
     const checks = [];
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 15; i++) {
       const u1 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}jp-${i}.jpg`;
       const u2 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}-${i}.jpg`;
       checks.push(
@@ -1399,29 +1495,10 @@ async function autoFetchByCode() {
     sampleResults.filter(Boolean).forEach(u => foundImages.push(u));
   }
 
-  // Prestige公式のサンプル画像フォールバック
-  if (foundImages.length <= 1 && info.isPrestige) {
-    const pChecks = [];
-    for (let i = 1; i <= 10; i++) {
-      const pu = `https://www.prestige-av.com/api/media/goods/prestige/${info.prefix}/${info.pad3}/pf_${info.prefix}-${info.pad3}_${i}.jpg`;
-      pChecks.push(probeImageNoReferrer(pu, 2500).then(ok => ok ? pu : null));
-    }
-    const pRes = await Promise.all(pChecks);
-    pRes.filter(Boolean).forEach(u => foundImages.push(u));
-  }
-
-  // 3. タイトル取得（複数プロキシフォールバック）
-  if (!document.getElementById('work-title').value) {
-    try {
-      const targetUrl = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
-      const proxyRes = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
-      if (proxyRes.ok) {
-        const html = await proxyRes.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const imgAlt = doc.querySelector('#list li .tmb img')?.getAttribute('alt') || doc.querySelector('.tmb a span.txt')?.textContent;
-        if (imgAlt) document.getElementById('work-title').value = imgAlt.trim();
-      }
-    } catch (e) {}
+  // 4. タイトルをマルチ検索ルートで取得
+  const fetchedTitle = await fetchTitleMultiRoute(normalizedCode, matchedCid);
+  if (fetchedTitle) {
+    document.getElementById('work-title').value = fetchedTitle;
   }
 
   if (!document.getElementById('work-url').value) {
@@ -1431,7 +1508,7 @@ async function autoFetchByCode() {
   if (foundImages.length > 0) {
     document.getElementById('work-sample-urls').value = foundImages.join('\n');
     renderUrlPreviewStrip();
-    statusEl.textContent = `取得完了：画像を ${foundImages.length}枚 検出しました（下にプレビュー表示）`;
+    statusEl.textContent = `取得成功：表紙＋サンプル 計${foundImages.length}枚${fetchedTitle ? ' ＆ タイトル' : ''}を取得しました`;
   } else {
     statusEl.textContent = `自動検出できませんでした（手動でURLまたは写真を選択してください）`;
   }
@@ -1442,6 +1519,210 @@ function renderUrlPreviewStrip() {
   const urls = document.getElementById('work-sample-urls').value.split('\n').map(s => s.trim()).filter(Boolean);
   const strip = document.getElementById('autofetch-preview');
   strip.innerHTML = urls.slice(0, 8).map(u => `<img src="${u}" referrerpolicy="no-referrer" alt="">`).join('');
+}
+
+/* =========================================================
+   Immersive Fullscreen Lightbox (Tap HUD Toggle, Swipe, Pinch Zoom)
+========================================================= */
+let zoomScale = 1;
+let panX = 0;
+let panY = 0;
+let startDist = 0;
+let startScale = 1;
+let touchStartX = 0;
+let touchStartY = 0;
+let lastPanX = 0;
+let lastPanY = 0;
+let isPinching = false;
+let hasMoved = false;
+let lastTapTime = 0;
+let tapTimeout = null;
+
+function applyLightboxTransform(withTransition = false) {
+  const img = document.getElementById('lightbox-img');
+  img.style.transition = withTransition ? 'transform 0.22s ease-out' : 'none';
+  img.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoomScale})`;
+}
+
+function resetZoom() {
+  zoomScale = 1;
+  panX = 0;
+  panY = 0;
+  applyLightboxTransform(true);
+}
+
+function initLightboxGestures() {
+  const stage = document.getElementById('lightbox-stage');
+
+  stage.addEventListener('touchstart', (e) => {
+    hasMoved = false;
+    if (e.touches.length === 2) {
+      isPinching = true;
+      startDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      startScale = zoomScale;
+    } else if (e.touches.length === 1) {
+      isPinching = false;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      lastPanX = panX;
+      lastPanY = panY;
+    }
+  }, { passive: false });
+
+  stage.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches.length === 2 && isPinching) {
+      hasMoved = true;
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      zoomScale = Math.min(5, Math.max(1, startScale * (dist / startDist)));
+      applyLightboxTransform(false);
+    } else if (e.touches.length === 1 && !isPinching) {
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) hasMoved = true;
+
+      if (zoomScale > 1.02) {
+        panX = lastPanX + dx;
+        panY = lastPanY + dy;
+        applyLightboxTransform(false);
+      }
+    }
+  }, { passive: false });
+
+  stage.addEventListener('touchend', (e) => {
+    if (isPinching && e.touches.length === 0) {
+      isPinching = false;
+      if (zoomScale <= 1.05) resetZoom();
+      return;
+    }
+
+    if (!hasMoved && e.changedTouches.length === 1) {
+      const now = Date.now();
+      // ダブルタップで2.5倍拡大 ⇔ 等倍リセット
+      if (now - lastTapTime < 280) {
+        clearTimeout(tapTimeout);
+        if (zoomScale > 1.1) {
+          resetZoom();
+        } else {
+          zoomScale = 2.5;
+          panX = 0;
+          panY = 0;
+          applyLightboxTransform(true);
+        }
+        lastTapTime = 0;
+      } else {
+        lastTapTime = now;
+        // シングルタップでメニュー(HUD)の表示/非表示を切り替え
+        tapTimeout = setTimeout(() => {
+          document.getElementById('lightbox').classList.toggle('hud-hidden');
+        }, 260);
+      }
+      return;
+    }
+
+    // 等倍時の左右スワイプで前後の画像へ切り替え
+    if (zoomScale <= 1.05 && e.changedTouches.length === 1) {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) stepLightbox(1);
+        else stepLightbox(-1);
+      }
+    }
+  });
+
+  // PCクリック時にもメニュー表示/非表示を切り替え
+  stage.addEventListener('click', (e) => {
+    if ('ontouchstart' in window) return;
+    document.getElementById('lightbox').classList.toggle('hud-hidden');
+  });
+}
+
+function openPortraitFullscreen() {
+  const a = state.actresses.find(x => x.id === currentActressId);
+  if (!a || !a.avatar) return;
+  lightboxList = [{ src: a.avatar, id: a.id, type: 'portrait', label: a.name }];
+  lightboxIndex = 0;
+  showLightboxAt(0);
+}
+
+function openFolderLightbox(index) {
+  const items = state.media.filter(m => m.actressId === currentActressId);
+  lightboxList = items.map((m, i) => ({
+    src: m.dataUrl,
+    id: m.id,
+    type: 'media',
+    label: `フォルダ (${i + 1}/${items.length})`
+  }));
+  lightboxIndex = index;
+  showLightboxAt(lightboxIndex);
+}
+
+function openWorkSamples(workId, autoParapara = false) {
+  const w = state.works.find(x => x.id === workId);
+  if (!w || !w.images || !w.images.length) return;
+  lightboxList = w.images.map((src, i) => ({
+    src,
+    id: workId,
+    type: 'work',
+    label: `${w.code ? '[' + w.code + '] ' : ''}${w.title} (${i + 1}/${w.images.length})`
+  }));
+  lightboxIndex = 0;
+  showLightboxAt(0);
+  if (autoParapara) toggleParapara(true);
+}
+
+function showLightboxAt(idx) {
+  if (!lightboxList.length) return;
+  resetZoom();
+  lightboxIndex = (idx + lightboxList.length) % lightboxList.length;
+  const item = lightboxList[lightboxIndex];
+  document.getElementById('lightbox-img').src = item.src;
+  document.getElementById('lightbox-caption').textContent = item.label;
+  document.getElementById('btn-lightbox-del').classList.toggle('hidden', item.type !== 'media');
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function stepLightbox(dir) { showLightboxAt(lightboxIndex + dir); }
+
+function toggleParapara(forceOn = false) {
+  const btn = document.getElementById('btn-parapara');
+  if (paraparaTimer && !forceOn) {
+    clearInterval(paraparaTimer);
+    paraparaTimer = null;
+    btn.textContent = 'パラパラ再生: OFF';
+  } else {
+    if (paraparaTimer) clearInterval(paraparaTimer);
+    paraparaTimer = setInterval(() => stepLightbox(1), 650);
+    btn.textContent = 'パラパラ再生: ON';
+  }
+}
+
+function deleteCurrentMedia() {
+  const current = lightboxList[lightboxIndex];
+  if (!current || current.type !== 'media') return;
+  if (!confirm('このメディアをフォルダから削除しますか？')) return;
+  state.media = state.media.filter(m => m.id !== current.id);
+  saveState();
+  closeLightbox(null, true);
+  renderFolderGrid();
+}
+
+function closeLightbox(e, force = false) {
+  if (!force && e && e.target.id !== 'lightbox') return;
+  if (paraparaTimer) {
+    clearInterval(paraparaTimer);
+    paraparaTimer = null;
+    document.getElementById('btn-parapara').textContent = 'パラパラ再生: OFF';
+  }
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('open', 'hud-hidden');
 }
 
 /* =========================================================
@@ -1517,7 +1798,7 @@ function switchMainView(view) {
   } else if (view === 'settings') {
     document.getElementById('view-settings').classList.remove('hidden');
     document.getElementById('nav-settings').classList.add('active');
-    document.getElementById('header-title').textContent = '設定・同期';
+    document.getElementById('header-title').textContent = '設定・金庫同期';
   }
   window.scrollTo(0, 0);
 }
@@ -1566,7 +1847,7 @@ function renderRoster() {
   const grid = document.getElementById('roster-grid');
 
   if (list.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">右上の「＋ 登録」から女優を追加するか、<br>「設定」からGitHubデータを読み込んでください</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">右上の「＋ 登録」から女優を追加するか、<br>「設定」から秘密の金庫 (empire-vault) を同期してください</div>`;
     return;
   }
 
@@ -1652,9 +1933,9 @@ function renderWorksList() {
             <div class="work-title">${w.title}</div>
           </div>
           <div class="work-actions">
-            <button class="btn-mini" onclick="openWorkSamples('${w.id}')">サンプル (${sampleCount}枚)</button>
+            <button class="btn-mini" onclick="openWorkSamples('${w.id}')">全画面 (${sampleCount}枚)</button>
             <button class="btn-mini" onclick="openWorkSamples('${w.id}', true)">パラパラ再生</button>
-            ${w.url ? `<a class="btn-mini" href="${w.url}" target="_blank" onclick="nominateActress('${currentActressId}', true)">Safariで視聴</a>` : ''}
+            ${w.url ? `<a class="btn-mini" href="${w.url}" target="_blank" onclick="nominateActress('${currentActressId}', true)">Safari視聴</a>` : ''}
             <button class="btn-mini" onclick="deleteWork('${w.id}')">削除</button>
           </div>
         </div>
@@ -1860,7 +2141,7 @@ function showDayLog(dateStr) {
 }
 
 /* =========================================================
-   Folder Upload & Lightbox
+   Folder Upload
 ========================================================= */
 async function handleFolderUpload(e) {
   const files = Array.from(e.target.files);
@@ -1895,74 +2176,6 @@ function promptMediaUrl() {
   });
   saveState();
   renderFolderGrid();
-}
-
-function openFolderLightbox(index) {
-  const items = state.media.filter(m => m.actressId === currentActressId);
-  lightboxList = items.map(m => ({ src: m.dataUrl, id: m.id, type: 'media', label: '専用フォルダ保管メディア' }));
-  lightboxIndex = index;
-  showLightboxAt(lightboxIndex);
-}
-
-function openWorkSamples(workId, autoParapara = false) {
-  const w = state.works.find(x => x.id === workId);
-  if (!w || !w.images || !w.images.length) return;
-  lightboxList = w.images.map((src, i) => ({
-    src,
-    id: workId,
-    type: 'work',
-    label: `${w.code ? '[' + w.code + '] ' : ''}${w.title} (${i + 1}/${w.images.length})`
-  }));
-  lightboxIndex = 0;
-  showLightboxAt(0);
-  if (autoParapara) toggleParapara(true);
-}
-
-function showLightboxAt(idx) {
-  if (!lightboxList.length) return;
-  lightboxIndex = (idx + lightboxList.length) % lightboxList.length;
-  const item = lightboxList[lightboxIndex];
-  document.getElementById('lightbox-img').src = item.src;
-  document.getElementById('lightbox-caption').textContent = item.label;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function stepLightbox(dir) { showLightboxAt(lightboxIndex + dir); }
-
-function toggleParapara(forceOn = false) {
-  const btn = document.getElementById('btn-parapara');
-  if (paraparaTimer && !forceOn) {
-    clearInterval(paraparaTimer);
-    paraparaTimer = null;
-    btn.textContent = 'パラパラ再生: OFF';
-  } else {
-    if (paraparaTimer) clearInterval(paraparaTimer);
-    paraparaTimer = setInterval(() => stepLightbox(1), 650);
-    btn.textContent = 'パラパラ再生: ON';
-  }
-}
-
-function deleteCurrentMedia() {
-  const current = lightboxList[lightboxIndex];
-  if (!current || current.type !== 'media') {
-    alert('作品のサンプル画像は作品リストから削除できます');
-    return;
-  }
-  if (!confirm('このメディアをフォルダから削除しますか？')) return;
-  state.media = state.media.filter(m => m.id !== current.id);
-  saveState();
-  closeLightbox(null, true);
-  renderFolderGrid();
-}
-
-function closeLightbox(e, force = false) {
-  if (!force && e && e.target.id !== 'lightbox') return;
-  if (paraparaTimer) {
-    clearInterval(paraparaTimer);
-    paraparaTimer = null;
-    document.getElementById('btn-parapara').textContent = 'パラパラ再生: OFF';
-  }
-  document.getElementById('lightbox').classList.remove('open');
 }
 
 /* =========================================================
@@ -2242,7 +2455,7 @@ function importDatabase(e) {
       if (imported && Array.isArray(imported.actresses)) {
         state = imported;
         await saveState();
-        showToast('データを復元＆クラウド同期しました');
+        showToast('データを復元＆金庫へ同期しました');
         showRoster();
       }
     } catch (err) {
@@ -2253,11 +2466,11 @@ function importDatabase(e) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  initLightboxGestures();
   await initDB();
   await loadState();
   detectGitHubRepo();
   renderRoster();
-  // 起動時にGitHub上のdata.jsonがあれば自動で最新状態を取得
   await pullFromGitHub(false);
 });
 </script>
