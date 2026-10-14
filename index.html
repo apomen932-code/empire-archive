@@ -21,7 +21,7 @@
     --gold-glow: rgba(205, 168, 97, 0.22);
     --text-main: #eee7d7;
     --text-sub: #968c79;
-    --safe-top: env(safe-area-inset-top, 16px);
+    --safe-top: env(safe-area-inset-top, 44px);
     --safe-bottom: env(safe-area-inset-bottom, 20px);
   }
 
@@ -39,7 +39,7 @@
     color: var(--text-main);
     font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", -apple-system, serif;
     overflow-x: hidden;
-    padding-bottom: calc(82px + var(--safe-bottom));
+    padding-bottom: calc(84px + var(--safe-bottom));
     min-height: 100vh;
   }
 
@@ -54,22 +54,23 @@
     flex-shrink: 0;
   }
 
+  /* Header (iPhone ノッチ・時計被り完全回避) */
   header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(5, 5, 6, 0.92);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(5, 5, 6, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--gold-border-dim);
-    padding: 14px 16px;
+    padding: calc(10px + var(--safe-top)) 16px 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
   .header-side {
-    width: 92px;
+    width: 96px;
     display: flex;
     align-items: center;
   }
@@ -93,9 +94,9 @@
   .btn-back-minimal:active { opacity: 0.6; }
 
   .header-title {
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     color: var(--gold-bright);
     text-align: center;
     flex: 1;
@@ -110,7 +111,8 @@
     border-radius: 50%;
     background: #555;
     display: inline-block;
-    margin-right: 4px;
+    margin-right: 5px;
+    flex-shrink: 0;
   }
   .sync-dot.online { background: #d4af37; box-shadow: 0 0 6px #f3dfb2; }
   .sync-dot.syncing { background: #fff; animation: pulse 0.8s infinite alternate; }
@@ -131,6 +133,7 @@
     justify-content: center;
     gap: 5px;
     transition: all 0.2s;
+    text-decoration: none;
   }
   .btn-gold:active {
     transform: scale(0.96);
@@ -141,6 +144,10 @@
     color: #090806;
     font-weight: 700;
     border-color: var(--gold-bright);
+  }
+  .btn-gold:disabled {
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   .control-bar {
@@ -436,16 +443,21 @@
     display: flex;
     gap: 12px;
     box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .work-card:active {
+    transform: scale(0.98);
+    border-color: var(--gold-bright);
   }
   .work-cover {
-    width: 112px;
-    height: 78px;
+    width: 116px;
+    height: 80px;
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid var(--gold-border-dim);
     background: #16151a;
     flex-shrink: 0;
-    cursor: pointer;
   }
   .work-info {
     flex: 1;
@@ -468,23 +480,102 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin: 2px 0 6px;
+    margin: 2px 0 4px;
   }
-  .work-actions {
+  .work-card-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
+    margin-bottom: 4px;
   }
-  .btn-mini {
-    background: #141317;
+  .work-card-tag {
+    font-size: 0.62rem;
     color: var(--gold-bright);
+    background: rgba(205, 168, 97, 0.12);
     border: 1px solid var(--gold-border-dim);
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    border-radius: 4px;
+    padding: 1px 5px;
+    border-radius: 3px;
     font-family: -apple-system, sans-serif;
-    text-decoration: none;
+  }
+
+  /* =========================================================
+     WORK DETAIL VIEW (新設：作品詳細画面)
+  ========================================================= */
+  .work-detail-hero {
+    padding: 14px;
+    background: radial-gradient(circle at 50% 0%, rgba(205, 168, 97, 0.14), transparent 75%);
+    border-bottom: 1px solid var(--gold-border-dim);
+  }
+  .work-hero-cover-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 10.8;
+    background: #09090b;
+    border-radius: 8px;
+    padding: 3px;
+    border: 1.5px solid var(--gold-bright);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.85);
+    overflow: hidden;
+    margin-bottom: 12px;
     cursor: pointer;
+  }
+  .work-hero-cover-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .work-detail-code {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--gold-main);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .work-detail-title {
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .work-detail-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .sample-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 14px;
+  }
+  .sample-thumb-card {
+    aspect-ratio: 4 / 3;
+    background: #0b0b0d;
+    border: 1px solid var(--gold-border);
+    border-radius: 5px;
+    padding: 2px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+  }
+  .sample-thumb-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  .sample-index-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(5, 5, 6, 0.8);
+    color: var(--gold-bright);
+    font-size: 0.58rem;
+    font-family: sans-serif;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--gold-border-dim);
   }
 
   /* Panels & Charts */
@@ -522,7 +613,7 @@
     font-size: 0.78rem;
   }
   .stat-bar-label {
-    width: 86px;
+    width: 92px;
     color: var(--text-main);
     white-space: nowrap;
     overflow: hidden;
@@ -654,7 +745,7 @@
   .nav-item.active .svg-icon { filter: drop-shadow(0 0 6px rgba(243, 223, 178, 0.7)); }
 
   /* =========================================================
-     IMMERSIVE FULLSCREEN LIGHTBOX (Pinch Zoom, Swipe, Tap HUD Toggle)
+     FINGER-TRACKING CAROUSEL & FOCAL-POINT PINCH LIGHTBOX
   ========================================================= */
   .lightbox {
     position: fixed;
@@ -667,9 +758,25 @@
   }
   .lightbox.open { display: block; }
 
-  .lightbox-stage {
+  .lightbox-carousel {
     width: 100vw;
     height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lightbox-track {
+    display: flex;
+    width: 300vw;
+    height: 100vh;
+    transform: translate3d(-100vw, 0, 0);
+    will-change: transform;
+  }
+
+  .lightbox-slide {
+    width: 100vw;
+    height: 100vh;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -677,7 +784,7 @@
     position: relative;
   }
 
-  #lightbox-img {
+  .lightbox-slide img {
     width: 100vw;
     height: 100vh;
     object-fit: contain;
@@ -692,13 +799,13 @@
     top: 0;
     left: 0;
     right: 0;
-    padding: calc(12px + var(--safe-top)) 16px 16px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.82) 0%, transparent 100%);
+    padding: calc(10px + var(--safe-top)) 16px 16px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 510;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
 
   .lightbox-hud-bottom {
@@ -711,19 +818,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     z-index: 510;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
 
   .lightbox.hud-hidden .lightbox-hud-top {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-24px);
     pointer-events: none;
   }
   .lightbox.hud-hidden .lightbox-hud-bottom {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
     pointer-events: none;
   }
 
@@ -732,7 +839,7 @@
     position: fixed;
     inset: 0;
     z-index: 120;
-    background: rgba(0, 0, 0, 0.84);
+    background: rgba(0, 0, 0, 0.85);
     display: none;
     align-items: center;
     justify-content: center;
@@ -744,8 +851,8 @@
     border: 1px solid var(--gold-main);
     border-radius: 8px;
     width: 100%;
-    max-width: 430px;
-    max-height: 88vh;
+    max-width: 440px;
+    max-height: 86vh;
     overflow-y: auto;
     padding: 18px 16px;
     display: flex;
@@ -768,8 +875,8 @@
     padding: 4px 0;
   }
   .preview-strip img {
-    width: 68px;
-    height: 50px;
+    width: 72px;
+    height: 52px;
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid var(--gold-border);
@@ -780,7 +887,7 @@
 
   #toast {
     position: fixed;
-    top: 66px;
+    top: calc(58px + var(--safe-top));
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, var(--gold-bright), var(--gold-main));
@@ -794,6 +901,7 @@
     pointer-events: none;
     transition: opacity 0.25s;
     white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.85);
   }
 </style>
 </head>
@@ -803,7 +911,7 @@
 
 <header>
   <div class="header-side">
-    <button id="btn-back" class="btn-back-minimal hidden" onclick="showRoster()">
+    <button id="btn-back" class="btn-back-minimal hidden" onclick="handleHeaderBack()">
       <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       <span>戻る</span>
     </button>
@@ -815,10 +923,11 @@
   <div class="header-side right">
     <button id="btn-top-action" class="btn-gold" onclick="openActressModal()">＋ 登録</button>
     <button id="btn-edit-actress" class="btn-gold hidden" onclick="openActressModal(currentActressId)">編集</button>
+    <button id="btn-edit-work" class="btn-gold hidden" onclick="openWorkModal(currentWorkId)">編集</button>
   </div>
 </header>
 
-<!-- VIEW 1: ROSTER -->
+<!-- VIEW 1: ROSTER (名簿一覧) -->
 <section id="view-roster">
   <div class="control-bar">
     <div class="control-top">
@@ -835,7 +944,7 @@
   <div id="roster-grid" class="roster-grid"></div>
 </section>
 
-<!-- VIEW 2: ACTRESS DETAIL -->
+<!-- VIEW 2: ACTRESS DETAIL (女優の個室) -->
 <section id="view-detail" class="hidden">
   <div class="detail-hero">
     <div class="portrait-frame" onclick="openPortraitFullscreen()">
@@ -863,7 +972,7 @@
 
   <div id="detail-works-pane">
     <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-size:0.76rem; color:var(--text-sub); letter-spacing:0.06em;">登録作品アーカイブ</span>
+      <span style="font-size:0.76rem; color:var(--text-sub); letter-spacing:0.06em;">作品カードをタップで詳細＆高画質サンプルへ</span>
       <button class="btn-gold" onclick="openWorkModal()">＋ 作品を追加</button>
     </div>
     <div id="works-list" class="works-list"></div>
@@ -879,6 +988,29 @@
     </div>
     <div id="folder-grid" class="folder-grid"></div>
   </div>
+</section>
+
+<!-- VIEW 2.5: WORK DETAIL (新設：作品詳細画面) -->
+<section id="view-work-detail" class="hidden">
+  <div class="work-detail-hero">
+    <div class="work-hero-cover-wrap" onclick="openWorkSampleAt(0)">
+      <img id="wd-cover" src="" alt="" referrerpolicy="no-referrer">
+    </div>
+    <div id="wd-code" class="work-detail-code"></div>
+    <div id="wd-title" class="work-detail-title"></div>
+    <div id="wd-tags" class="spec-badges" style="justify-content:flex-start; margin-bottom:6px;"></div>
+
+    <div class="work-detail-actions">
+      <button class="btn-gold solid" style="flex:1;" onclick="openWorkSampleAt(0, true)">パラパラ自動再生</button>
+      <a id="wd-url-btn" class="btn-gold" href="#" target="_blank" onclick="nominateActress(currentActressId, true)">Safariで視聴</a>
+    </div>
+  </div>
+
+  <div style="padding:12px 14px 0; display:flex; justify-content:space-between; align-items:center;">
+    <span id="wd-sample-count" style="font-size:0.78rem; color:var(--gold-bright); letter-spacing:0.06em;">サンプル画像一覧</span>
+    <span style="font-size:0.7rem; color:var(--text-sub); font-family:sans-serif;">タップで全画面拡大・スワイプ</span>
+  </div>
+  <div id="wd-sample-grid" class="sample-gallery-grid"></div>
 </section>
 
 <!-- VIEW 3: ANALYTICS & ARENA -->
@@ -897,7 +1029,7 @@
       <div style="font-size:0.78rem; color:var(--gold-main); margin:14px 0 8px;">◆ 年代別の寵愛比率</div>
       <div id="dna-age-bars"></div>
 
-      <div style="font-size:0.78rem; color:var(--gold-main); margin:14px 0 8px;">◆ 好みの属性タグ TOP 8</div>
+      <div style="font-size:0.78rem; color:var(--gold-main); margin:14px 0 8px;">◆ 好みの女優属性 ＆ 作品タグ TOP 10</div>
       <div id="dna-tag-bars"></div>
     </div>
 
@@ -946,16 +1078,17 @@
   </div>
 </section>
 
-<!-- VIEW 5: SETTINGS (Private Vault Sync) -->
+<!-- VIEW 5: SETTINGS (404エラー対策＆自動診断機能付き) -->
 <section id="view-settings" class="hidden">
   <div class="section-wrap" style="font-family:-apple-system, sans-serif;">
     <div class="lux-panel" style="display:flex; flex-direction:column; gap:10px;">
       <div class="panel-title" style="font-family:serif;"><span>秘密の金庫（empire-vault）自動同期</span></div>
       <p style="font-size:0.74rem; color:var(--text-sub); line-height:1.5;">
-        非公開リポジトリ <code>empire-vault</code> に全データを暗号化通信で自動保存します。プライベートブラウズや別端末でもトークンを入れるだけで即座に同期されます。
+        非公開リポジトリへ全データを自動保存します。<br>
+        ※もし「HTTP 404」が出る場合は、トークン発行時に <strong>Tokens (classic)</strong> で一番上の <strong><code>repo</code></strong> にチェックが入っているか確認してください。
       </p>
       <div class="form-row">
-        <label>GitHub オーナー名 ／ 非公開リポジトリ名</label>
+        <label>GitHub オーナー名 ／ 保存先リポジトリ名</label>
         <div style="display:flex; gap:6px;">
           <input type="text" id="gh-owner" placeholder="apomen932-code" style="flex:1;">
           <input type="text" id="gh-repo" value="empire-vault" placeholder="empire-vault" style="flex:1;">
@@ -969,7 +1102,7 @@
         <button class="btn-gold solid" style="flex:1;" onclick="saveGitHubConfigAndSync()">保存して同期開始</button>
         <button class="btn-gold" onclick="pullFromGitHub(true)">金庫から強制読込</button>
       </div>
-      <div id="gh-sync-log" style="font-size:0.72rem; color:var(--gold-main); margin-top:4px;"></div>
+      <div id="gh-sync-log" style="font-size:0.73rem; color:var(--gold-bright); margin-top:4px; line-height:1.5;"></div>
     </div>
 
     <div class="lux-panel" style="display:flex; flex-direction:column; gap:10px;">
@@ -983,19 +1116,23 @@
   </div>
 </section>
 
-<!-- IMMERSIVE FULLSCREEN LIGHTBOX (1タップでメニュー非表示・スワイプ切替・ピンチ拡大) -->
+<!-- FINGER-TRACKING FULLSCREEN LIGHTBOX -->
 <div id="lightbox" class="lightbox">
   <div class="lightbox-hud-top" onclick="event.stopPropagation()">
-    <div id="lightbox-caption" style="color:var(--gold-bright); font-size:0.8rem; font-family:sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75vw;"></div>
+    <div id="lightbox-caption" style="color:var(--gold-bright); font-size:0.8rem; font-family:sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:72vw;"></div>
     <button class="btn-gold" onclick="closeLightbox(null, true)">✕ 閉じる</button>
   </div>
 
-  <div id="lightbox-stage" class="lightbox-stage">
-    <img id="lightbox-img" src="" alt="" referrerpolicy="no-referrer">
+  <div id="lightbox-carousel" class="lightbox-carousel">
+    <div id="lightbox-track" class="lightbox-track">
+      <div class="lightbox-slide"><img id="lb-img-prev" src="" alt="" referrerpolicy="no-referrer"></div>
+      <div class="lightbox-slide"><img id="lb-img-curr" src="" alt="" referrerpolicy="no-referrer"></div>
+      <div class="lightbox-slide"><img id="lb-img-next" src="" alt="" referrerpolicy="no-referrer"></div>
+    </div>
   </div>
 
   <div class="lightbox-hud-bottom" onclick="event.stopPropagation()">
-    <button class="btn-gold" onclick="resetZoom()">等倍リセット</button>
+    <button class="btn-gold" onclick="resetZoom()">等倍に戻す</button>
     <button id="btn-parapara" class="btn-gold" onclick="toggleParapara()">パラパラ再生: OFF</button>
     <button id="btn-lightbox-del" class="btn-gold" onclick="deleteCurrentMedia()">削除</button>
   </div>
@@ -1041,14 +1178,15 @@
   </div>
 </div>
 
-<!-- MODAL: WORK ADD -->
+<!-- MODAL: WORK ADD & EDIT (作品タグ・編集・高画質自動取得対応) -->
 <div id="modal-work" class="modal-backdrop">
   <div class="modal-card">
-    <div class="panel-title"><span>作品・サンプル画像の登録</span></div>
+    <div class="panel-title"><span id="work-modal-title">作品・サンプル画像の登録</span></div>
+    <input type="hidden" id="edit-work-id">
     <div class="form-row">
-      <label>品番（例：ABF-391 / SONE-123 / START-001）</label>
+      <label>品番（入力して「自動取得」を押すと高画質表紙・サンプル・タイトルを一括検索）</label>
       <div style="display:flex; gap:6px;">
-        <input type="text" id="work-code" placeholder="ABF-391" style="flex:1;">
+        <input type="text" id="work-code" placeholder="例：ABF-391 / SONE-123" style="flex:1;">
         <button type="button" id="btn-autofetch" class="btn-gold solid" onclick="autoFetchByCode()">自動取得</button>
       </div>
       <div id="autofetch-status" style="font-size:0.72rem; color:var(--gold-main); margin-top:3px;"></div>
@@ -1059,19 +1197,24 @@
       <input type="text" id="work-title" placeholder="自動取得または手動入力">
     </div>
     <div class="form-row">
+      <label>作品タグ（カンマ区切り：シチュエーションや衣装など）</label>
+      <input type="text" id="work-tags" placeholder="例：ナース, 主観, コスプレ, 痴女">
+    </div>
+    <div class="form-row">
       <label>視聴ページURL（任意）</label>
       <input type="text" id="work-url" placeholder="https://...">
     </div>
     <div class="form-row">
-      <label>画像URL一覧（1行目が表紙、2行目以降がサンプル画像）</label>
-      <textarea id="work-sample-urls" rows="3" placeholder="自動取得されたURLが入ります" oninput="renderUrlPreviewStrip()"></textarea>
+      <label>高画質画像URL一覧（1行目が表紙、2行目以降がサンプル画像）</label>
+      <textarea id="work-sample-urls" rows="3" placeholder="自動取得された高画質URLが入ります" oninput="renderUrlPreviewStrip()"></textarea>
     </div>
     <div class="form-row">
       <label>または端末から画像ファイルを追加（複数選択可）</label>
       <input type="file" id="work-files" accept="image/*" multiple>
     </div>
     <div style="display:flex; gap:8px; margin-top:8px;">
-      <button class="btn-gold solid" style="flex:1;" onclick="saveWork()">作品を追加</button>
+      <button class="btn-gold solid" style="flex:1;" onclick="saveWork()">保存する</button>
+      <button id="btn-delete-work" class="btn-gold hidden" onclick="deleteWorkFromModal()">削除</button>
       <button class="btn-gold" onclick="closeWorkModal()">閉じる</button>
     </div>
   </div>
@@ -1099,7 +1242,7 @@
 
 <script>
 /* =========================================================
-   IndexedDB & Private Vault GitHub Sync Engine
+   IndexedDB & Private Vault GitHub Sync Engine (404 Diagnose & Auto-Fallback)
 ========================================================= */
 const DB_NAME = 'EmpireArchiveDB';
 const DB_VERSION = 1;
@@ -1113,12 +1256,16 @@ let state = {
   updatedAt: 0
 };
 
+let currentView = 'roster';
 let currentActressId = null;
+let currentWorkId = null;
 let activeTagFilter = null;
 let currentCalDate = new Date();
+
 let lightboxList = [];
 let lightboxIndex = 0;
 let paraparaTimer = null;
+
 let currentGachaActressId = null;
 let tournamentPool = [];
 let tournamentNext = [];
@@ -1171,7 +1318,6 @@ function detectGitHubRepo() {
   }
 
   document.getElementById('gh-owner').value = savedOwner || defaultOwner;
-  // 非公開の秘密の金庫「empire-vault」をデフォルトに設定
   document.getElementById('gh-repo').value = savedRepo || 'empire-vault';
   document.getElementById('gh-token').value = savedToken;
   updateSyncBadge(savedToken ? 'online' : 'offline');
@@ -1196,18 +1342,66 @@ async function saveGitHubConfigAndSync() {
   const owner = document.getElementById('gh-owner').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
   const token = document.getElementById('gh-token').value.trim();
+  const logEl = document.getElementById('gh-sync-log');
+
   if (!owner || !repo || !token) return alert('オーナー名、リポジトリ名、トークンをすべて入力してください');
 
-  localStorage.setItem('gh_owner', owner);
-  localStorage.setItem('gh_repo', repo);
-  localStorage.setItem('gh_token', token);
+  logEl.textContent = 'トークンとリポジトリ権限を診断中...';
 
-  document.getElementById('gh-sync-log').textContent = '非公開リポジトリ (empire-vault) と通信中...';
-  if (state.actresses.length === 0) {
-    const pulled = await pullFromGitHub(true);
-    if (!pulled) await pushToGitHub();
-  } else {
-    await pushToGitHub();
+  // 1. まずトークン自体が有効か ＆ スコープに repo があるか診断
+  try {
+    const userRes = await fetch('https://api.github.com/user', {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!userRes.ok) {
+      logEl.textContent = `エラー: トークンが無効か期限切れです (HTTP ${userRes.status})`;
+      return;
+    }
+    const scopes = userRes.headers.get('x-oauth-scopes') || '';
+    const userData = await userRes.json();
+
+    // オーナー名の自動補正
+    if (userData.login && userData.login.toLowerCase() !== owner.toLowerCase()) {
+      document.getElementById('gh-owner').value = userData.login;
+    }
+    const actualOwner = document.getElementById('gh-owner').value.trim();
+
+    // 2. 指定されたリポジトリが見えるか確認、もし無ければ自動で作成を試みる！
+    let repoRes = await fetch(`https://api.github.com/repos/${actualOwner}/${repo}`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+
+    if (repoRes.status === 404) {
+      logEl.textContent = `リポジトリ "${repo}" が見つからないか非公開権限(repo)がありません。自動作成を試みます...`;
+      const createRes = await fetch('https://api.github.com/user/repos', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: repo, private: true, auto_init: true })
+      });
+
+      if (!createRes.ok && createRes.status !== 422) {
+        logEl.innerHTML = `⚠️ <strong>HTTP 404 の原因が判明しました：</strong><br>発行されたトークンにプライベートリポジトリの読み書き権限（<strong>repo</strong> スコープ）が付いていません。<br>GitHubの「Tokens (classic)」画面で一番上の <strong>[✓] repo</strong> にチェックを入れてトークンを再発行してください（現在のスコープ: ${scopes || 'なし'}）。`;
+        updateSyncBadge('offline', '権限不足');
+        return;
+      }
+    }
+
+    localStorage.setItem('gh_owner', actualOwner);
+    localStorage.setItem('gh_repo', repo);
+    localStorage.setItem('gh_token', token);
+
+    if (state.actresses.length === 0) {
+      const pulled = await pullFromGitHub(true);
+      if (!pulled) await pushToGitHub();
+    } else {
+      await pushToGitHub();
+    }
+  } catch (err) {
+    logEl.textContent = '通信エラー: ' + err.message;
   }
 }
 
@@ -1246,7 +1440,7 @@ async function pullFromGitHub(manual = false) {
 
   try {
     const headers = {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json'
     };
 
@@ -1281,7 +1475,7 @@ async function pullFromGitHub(manual = false) {
     if (logEl) logEl.textContent = `同期完了: ${new Date().toLocaleTimeString()}`;
     return true;
   } catch (e) {
-    updateSyncBadge('offline', '読込エラー');
+    updateSyncBadge('offline', '読込失敗');
     return false;
   }
 }
@@ -1296,7 +1490,7 @@ async function pushToGitHub() {
   try {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/data.json`;
     const headers = {
-      'Authorization': `token ${token}`,
+      'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json',
       'Content-Type': 'application/json'
     };
@@ -1321,27 +1515,30 @@ async function pushToGitHub() {
       body: JSON.stringify(body)
     });
 
-    if (!putRes.ok) throw new Error(`HTTP ${putRes.status}`);
+    if (!putRes.ok) {
+      const errJson = await putRes.json().catch(() => ({}));
+      throw new Error(`HTTP ${putRes.status} (${errJson.message || '権限またはブランチ未初期化'})`);
+    }
     const putData = await putRes.json();
     ghFileSha = putData.content.sha;
 
     updateSyncBadge('online', '金庫保存済');
     const logEl = document.getElementById('gh-sync-log');
-    if (logEl) logEl.textContent = `empire-vault へ自動保存完了 (${new Date().toLocaleTimeString()})`;
+    if (logEl) logEl.textContent = `✓ ${repo} へ自動保存完了 (${new Date().toLocaleTimeString()})`;
   } catch (e) {
-    updateSyncBadge('offline', '保存失敗');
+    updateSyncBadge('offline', '保存エラー');
     const logEl = document.getElementById('gh-sync-log');
-    if (logEl) logEl.textContent = `保存エラー: ${e.message}`;
+    if (logEl) logEl.innerHTML = `保存エラー: ${e.message}<br>※Tokens (classic) で <b>repo</b> にチェックが入っているか、または <b>empire-vault</b> にREADME等の初期ファイルがあるか確認してください。`;
   }
 }
 
 /* =========================================================
-   Product Code Auto-Fetch (表紙確実化 ＆ 3段階タイトル取得)
+   High-Speed Parallel & High-Res Auto-Fetch (NOW PRINTING完全排除 ＆ タイトル取得強化)
 ========================================================= */
 function buildCandidateUrls(rawCode) {
   const clean = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
   const m = clean.match(/^([A-Z]+)(\d+)$/);
-  if (!m) return { code: clean, cids: [], covers: [] };
+  if (!m) return { prefix: '', pad3: '', cids: [] };
 
   const prefix = m[1].toLowerCase();
   const num = m[2];
@@ -1351,34 +1548,35 @@ function buildCandidateUrls(rawCode) {
   const prestigePrefixes = ['abf', 'abp', 'abw', 'abs', 'sga', 'chn', 'onez', 'ama', 'bgn', 'docp', 'mgt', 'esk', 'kbi', 'tre'];
   const isPrestige = prestigePrefixes.includes(prefix);
 
-  const cids = [];
-  if (isPrestige) {
-    cids.push(`118${prefix}${pad3}`, `118${prefix}${pad5}`, `${prefix}${pad3}`, `${prefix}${pad5}`);
-  } else {
-    cids.push(`${prefix}${pad5}`, `${prefix}${pad3}`, `1${prefix}${pad3}`, `1${prefix}${pad5}`, `118${prefix}${pad3}`, `h_${prefix}${pad3}`);
-  }
+  const cids = isPrestige
+    ? [`118${prefix}${pad3}`, `118${prefix}${pad5}`, `${prefix}${pad3}`, `${prefix}${pad5}`]
+    : [`${prefix}${pad5}`, `${prefix}${pad3}`, `1${prefix}${pad3}`, `1${prefix}${pad5}`, `118${prefix}${pad3}`, `h_${prefix}${pad3}`];
 
   return { prefix, pad3, cids, isPrestige };
 }
 
-function probeImageNoReferrer(url, timeoutMs = 3800) {
+// DMMの「NOW PRINTING (147x200px)」や低画質サムネイル(300px以下)を完全に弾くため、minWidth=360px以上を要求
+function probeHighResImage(url, minWidth = 360, timeoutMs = 2800) {
   return new Promise((resolve) => {
     const img = new Image();
     img.referrerPolicy = 'no-referrer';
     let done = false;
-    const finish = (ok) => { if (!done) { done = true; resolve(ok); } };
-    const timer = setTimeout(() => finish(false), timeoutMs);
+    const finish = (res) => { if (!done) { done = true; resolve(res); } };
+    const timer = setTimeout(() => finish(null), timeoutMs);
     img.onload = () => {
       clearTimeout(timer);
-      if (img.naturalWidth > 110 && img.naturalHeight > 90) finish(true);
-      else finish(false);
+      if (img.naturalWidth >= minWidth && img.naturalHeight >= 220) {
+        finish({ url, w: img.naturalWidth, h: img.naturalHeight });
+      } else {
+        finish(null);
+      }
     };
-    img.onerror = () => { clearTimeout(timer); finish(false); };
+    img.onerror = () => { clearTimeout(timer); finish(null); };
     img.src = url;
   });
 }
 
-async function fetchTitleMultiRoute(normalizedCode, matchedCid) {
+async function fetchTitleFast(normalizedCode, info) {
   const cleanTitle = (raw) => {
     if (!raw) return '';
     return raw
@@ -1386,43 +1584,59 @@ async function fetchTitleMultiRoute(normalizedCode, matchedCid) {
       .replace(/ \| アダルト動画.*$/i, '')
       .replace(/ - DMM.*$/i, '')
       .replace(/ - FANZA.*$/i, '')
+      .replace(/ - エロ動画.*$/i, '')
       .replace(/【FANZA.*】/g, '')
       .replace(/^\s*\[[^\]]+\]\s*/, '')
+      .replace(new RegExp('^' + normalizedCode + '\\s*', 'i'), '')
       .trim();
   };
 
-  // Route 1: DuckDuckGo HTML Search (年齢確認ゲートをバイパスしてタイトル取得)
-  try {
-    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(normalizedCode + ' FANZA OR プレステージ')}`;
-    const res1 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(ddgUrl)}`);
-    if (res1.ok) {
-      const html = await res1.text();
+  // 複数の検索・メタデータ経路を並列実行し、一番早く返ってきたタイトルを採用
+  const tasks = [
+    // Route A: Prestige公式API (Prestige作品なら最速・年齢認証なしでJSON取得)
+    (async () => {
+      if (!info.isPrestige) return '';
+      const pUrl = `https://www.prestige-av.com/api/product?id=${info.prefix.toUpperCase()}-${info.pad3}`;
+      const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(pUrl)}`);
+      if (!res.ok) return '';
+      const data = await res.json();
+      return data?.title || data?.name || '';
+    })(),
+    // Route B: Yahoo検索経由でタイトル抽出 (年齢認証ゲートなし)
+    (async () => {
+      const yUrl = `https://search.yahoo.co.jp/search?p=${encodeURIComponent(normalizedCode + ' FANZA')}`;
+      const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(yUrl)}`);
+      if (!res.ok) return '';
+      const html = await res.text();
       const doc = new DOMParser().parseFromString(html, 'text/html');
-      const links = Array.from(doc.querySelectorAll('.result__a'));
-      for (const a of links) {
-        const txt = a.textContent || '';
-        if (txt.toUpperCase().includes(normalizedCode) || txt.length > 8) {
-          const cleaned = cleanTitle(txt);
-          if (cleaned && !cleaned.includes('検索結果')) return cleaned;
+      const headings = Array.from(doc.querySelectorAll('h3, a'));
+      for (const h of headings) {
+        const t = h.textContent || '';
+        if ((t.includes('FANZA') || t.includes('DMM') || t.toUpperCase().includes(normalizedCode)) && t.length > 12) {
+          const c = cleanTitle(t);
+          if (c.length > 5 && !c.includes('検索')) return c;
         }
       }
+      return '';
+    })(),
+    // Route C: DuckDuckGo Lite
+    (async () => {
+      const dUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(normalizedCode)}`;
+      const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(dUrl)}`);
+      if (!res.ok) return '';
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const first = doc.querySelector('.result__a')?.textContent || '';
+      return cleanTitle(first);
+    })()
+  ];
+
+  const results = await Promise.allSettled(tasks);
+  for (const r of results) {
+    if (r.status === 'fulfilled' && r.value && r.value.length > 3) {
+      return r.value;
     }
-  } catch (e) {}
-
-  // Route 2: codetabs proxy で直接作品ページまたは検索結果の og:title を取得
-  if (matchedCid) {
-    try {
-      const detailUrl = `https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=${matchedCid}/`;
-      const res2 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(detailUrl)}`);
-      if (res2.ok) {
-        const html = await res2.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const og = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || doc.querySelector('#title')?.textContent;
-        if (og && !og.includes('年齢認証')) return cleanTitle(og);
-      }
-    } catch (e) {}
   }
-
   return '';
 }
 
@@ -1433,71 +1647,67 @@ async function autoFetchByCode() {
   const statusEl = document.getElementById('autofetch-status');
   const btn = document.getElementById('btn-autofetch');
   btn.disabled = true;
-  statusEl.textContent = '表紙・サンプル画像・タイトルを自動検索中...';
+  const startTime = Date.now();
+  statusEl.textContent = '高速並列スキャン中（高画質サーバー照会）...';
 
   const m = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').match(/^([A-Z]+)(\d+)$/);
   const normalizedCode = m ? `${m[1]}-${m[2].padStart(3, '0')}` : rawCode.toUpperCase();
   document.getElementById('work-code').value = normalizedCode;
 
   const info = buildCandidateUrls(normalizedCode);
-  let matchedCid = null;
 
-  // 1. まずサンプル1枚目または表紙から確実なCIDを特定
-  for (const cid of info.cids) {
-    const testUrls = [
-      `https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-1.jpg`,
-      `https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`,
-      `https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`
-    ];
-    for (const tu of testUrls) {
-      if (await probeImageNoReferrer(tu, 2600)) {
-        matchedCid = cid;
-        break;
-      }
+  // タイトル取得を裏で同時スタート
+  const titlePromise = fetchTitleFast(normalizedCode, info);
+
+  // Step 1: 全CID候補の高画質パッケージ(pl.jpg: 800x538) と 高画質サンプル1枚目(jp-1.jpg) を一斉並列チェック！
+  const cidProbes = info.cids.map(async (cid) => {
+    const [coverDig, coverMono, sample1] = await Promise.all([
+      probeHighResImage(`https://pics.dmm.co.jp/digital/video/${cid}/${cid}pl.jpg`, 400, 2400),
+      probeHighResImage(`https://pics.dmm.co.jp/mono/movie/adult/${cid}/${cid}pl.jpg`, 400, 2400),
+      probeHighResImage(`https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-1.jpg`, 400, 2400)
+    ]);
+    if (coverDig || coverMono || sample1) {
+      return { cid, cover: (coverDig || coverMono)?.url || null, sample1: sample1?.url || null };
     }
-    if (matchedCid) break;
-  }
+    return null;
+  });
 
+  // Prestige公式高画質カバーも同時プローブ
+  const prestigeCoverPromise = info.isPrestige
+    ? probeHighResImage(`https://www.prestige-av.com/api/media/goods/prestige/${info.prefix}/${info.pad3}/pb_${info.prefix}-${info.pad3}.jpg`, 400, 2400)
+    : Promise.resolve(null);
+
+  const [cidResults, prestigeCover] = await Promise.all([
+    Promise.all(cidProbes),
+    prestigeCoverPromise
+  ]);
+
+  const validHit = cidResults.find(Boolean);
   const foundImages = [];
 
-  // 2. CIDが特定できたら、必ず「表紙パッケージ画像」を1枚目に確保！
-  if (matchedCid) {
-    const coverCandidates = [
-      `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}pl.jpg`,
-      `https://pics.dmm.co.jp/mono/movie/adult/${matchedCid}/${matchedCid}pl.jpg`,
-      `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}ps.jpg`,
-      `https://pics.dmm.co.jp/mono/movie/adult/${matchedCid}/${matchedCid}ps.jpg`
-    ];
-    if (info.isPrestige) {
-      coverCandidates.unshift(`https://www.prestige-av.com/api/media/goods/prestige/${info.prefix}/${info.pad3}/pb_${info.prefix}-${info.pad3}.jpg`);
-    }
-    for (const cUrl of coverCandidates) {
-      if (await probeImageNoReferrer(cUrl, 2800)) {
-        foundImages.push(cUrl);
-        break;
-      }
-    }
-
-    // 3. サンプル画像 (1〜15枚) を並列取得
-    const checks = [];
-    for (let i = 1; i <= 15; i++) {
-      const u1 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}jp-${i}.jpg`;
-      const u2 = `https://pics.dmm.co.jp/digital/video/${matchedCid}/${matchedCid}-${i}.jpg`;
-      checks.push(
-        probeImageNoReferrer(u1, 2800).then(async ok => {
-          if (ok) return u1;
-          const ok2 = await probeImageNoReferrer(u2, 2200);
-          return ok2 ? u2 : null;
-        })
-      );
-    }
-    const sampleResults = await Promise.all(checks);
-    sampleResults.filter(Boolean).forEach(u => foundImages.push(u));
+  if (prestigeCover) {
+    foundImages.push(prestigeCover.url);
+  } else if (validHit && validHit.cover) {
+    foundImages.push(validHit.cover);
   }
 
-  // 4. タイトルをマルチ検索ルートで取得
-  const fetchedTitle = await fetchTitleMultiRoute(normalizedCode, matchedCid);
-  if (fetchedTitle) {
+  // Step 2: 特定できたCIDで高画質サンプル画像 (jp-1 〜 jp-16) を一斉並列取得
+  if (validHit) {
+    const cid = validHit.cid;
+    const samplePromises = [];
+    for (let i = 1; i <= 16; i++) {
+      // 必ず「jp-」付きのフルサイズ高画質版(800px〜)を要求し、NOW PRINTING(147px)や縮小版を除外
+      const hiResUrl = `https://pics.dmm.co.jp/digital/video/${cid}/${cid}jp-${i}.jpg`;
+      samplePromises.push(probeHighResImage(hiResUrl, 380, 2500));
+    }
+    const samples = await Promise.all(samplePromises);
+    samples.filter(Boolean).forEach(s => {
+      if (!foundImages.includes(s.url)) foundImages.push(s.url);
+    });
+  }
+
+  const fetchedTitle = await titlePromise;
+  if (fetchedTitle && !document.getElementById('work-title').value) {
     document.getElementById('work-title').value = fetchedTitle;
   }
 
@@ -1505,10 +1715,11 @@ async function autoFetchByCode() {
     document.getElementById('work-url').value = `https://www.dmm.co.jp/search/=/searchstr=${encodeURIComponent(normalizedCode)}/`;
   }
 
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   if (foundImages.length > 0) {
     document.getElementById('work-sample-urls').value = foundImages.join('\n');
     renderUrlPreviewStrip();
-    statusEl.textContent = `取得成功：表紙＋サンプル 計${foundImages.length}枚${fetchedTitle ? ' ＆ タイトル' : ''}を取得しました`;
+    statusEl.textContent = `✓ ${elapsed}秒で高画質画像を ${foundImages.length}枚 取得しました（ダミー画像除外済）`;
   } else {
     statusEl.textContent = `自動検出できませんでした（手動でURLまたは写真を選択してください）`;
   }
@@ -1518,137 +1729,242 @@ async function autoFetchByCode() {
 function renderUrlPreviewStrip() {
   const urls = document.getElementById('work-sample-urls').value.split('\n').map(s => s.trim()).filter(Boolean);
   const strip = document.getElementById('autofetch-preview');
-  strip.innerHTML = urls.slice(0, 8).map(u => `<img src="${u}" referrerpolicy="no-referrer" alt="">`).join('');
+  strip.innerHTML = urls.slice(0, 10).map(u => `<img src="${u}" referrerpolicy="no-referrer" alt="">`).join('');
 }
 
 /* =========================================================
-   Immersive Fullscreen Lightbox (Tap HUD Toggle, Swipe, Pinch Zoom)
+   Finger-Tracking Carousel & Focal-Point Pinch Zoom Lightbox
 ========================================================= */
 let zoomScale = 1;
 let panX = 0;
 let panY = 0;
-let startDist = 0;
-let startScale = 1;
+
+let isDraggingCarousel = false;
+let isPinching = false;
+let gestureAxis = null; // 'x' | 'y' | null
 let touchStartX = 0;
 let touchStartY = 0;
-let lastPanX = 0;
-let lastPanY = 0;
-let isPinching = false;
+let startPanX = 0;
+let startPanY = 0;
+let currentSwipeDx = 0;
+
+let pinchStartDist = 0;
+let pinchStartScale = 1;
+let pinchStartMidX = 0;
+let pinchStartMidY = 0;
+
 let hasMoved = false;
 let lastTapTime = 0;
 let tapTimeout = null;
 
-function applyLightboxTransform(withTransition = false) {
-  const img = document.getElementById('lightbox-img');
-  img.style.transition = withTransition ? 'transform 0.22s ease-out' : 'none';
-  img.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoomScale})`;
+function updateSlideImages() {
+  if (!lightboxList.length) return;
+  const len = lightboxList.length;
+  const prevIdx = (lightboxIndex - 1 + len) % len;
+  const nextIdx = (lightboxIndex + 1) % len;
+
+  const prevEl = document.getElementById('lb-img-prev');
+  const currEl = document.getElementById('lb-img-curr');
+  const nextEl = document.getElementById('lb-img-next');
+
+  currEl.src = lightboxList[lightboxIndex].src;
+  prevEl.src = len > 1 ? lightboxList[prevIdx].src : '';
+  nextEl.src = len > 1 ? lightboxList[nextIdx].src : '';
+  prevEl.style.visibility = len > 1 ? 'visible' : 'hidden';
+  nextEl.style.visibility = len > 1 ? 'visible' : 'hidden';
+
+  document.getElementById('lightbox-caption').textContent = lightboxList[lightboxIndex].label;
+  document.getElementById('btn-lightbox-del').classList.toggle('hidden', lightboxList[lightboxIndex].type !== 'media');
 }
 
-function resetZoom() {
+function applyCurrZoomTransform(animate = false) {
+  const currImg = document.getElementById('lb-img-curr');
+  currImg.style.transition = animate ? 'transform 0.22s cubic-bezier(0.22, 1, 0.36, 1)' : 'none';
+  currImg.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoomScale})`;
+}
+
+function applyCarouselTrackOffset(dxPx, animate = false) {
+  const track = document.getElementById('lightbox-track');
+  track.style.transition = animate ? 'transform 0.26s cubic-bezier(0.22, 1, 0.36, 1)' : 'none';
+  track.style.transform = `translate3d(calc(-100vw + ${dxPx}px), 0, 0)`;
+}
+
+function resetZoom(animate = true) {
   zoomScale = 1;
   panX = 0;
   panY = 0;
-  applyLightboxTransform(true);
+  applyCurrZoomTransform(animate);
 }
 
 function initLightboxGestures() {
-  const stage = document.getElementById('lightbox-stage');
+  const carousel = document.getElementById('lightbox-carousel');
 
-  stage.addEventListener('touchstart', (e) => {
+  carousel.addEventListener('touchstart', (e) => {
     hasMoved = false;
+    gestureAxis = null;
+    currentSwipeDx = 0;
+
     if (e.touches.length === 2) {
       isPinching = true;
-      startDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      startScale = zoomScale;
+      isDraggingCarousel = false;
+      const t0 = e.touches[0];
+      const t1 = e.touches[1];
+      pinchStartDist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+      pinchStartScale = zoomScale;
+      // 2本指の中心点（画面中央からの相対座標）を記憶
+      pinchStartMidX = (t0.clientX + t1.clientX) / 2 - window.innerWidth / 2;
+      pinchStartMidY = (t0.clientY + t1.clientY) / 2 - window.innerHeight / 2;
+      startPanX = panX;
+      startPanY = panY;
     } else if (e.touches.length === 1) {
       isPinching = false;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
-      lastPanX = panX;
-      lastPanY = panY;
+      startPanX = panX;
+      startPanY = panY;
+      isDraggingCarousel = (zoomScale <= 1.02);
     }
   }, { passive: false });
 
-  stage.addEventListener('touchmove', (e) => {
+  carousel.addEventListener('touchmove', (e) => {
     e.preventDefault();
+
+    // 2本指ピンチイン・ピンチアウト（指のフォーカルポイント基準で滑らかにズーム＆移動）
     if (e.touches.length === 2 && isPinching) {
       hasMoved = true;
-      const dist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      zoomScale = Math.min(5, Math.max(1, startScale * (dist / startDist)));
-      applyLightboxTransform(false);
-    } else if (e.touches.length === 1 && !isPinching) {
+      const t0 = e.touches[0];
+      const t1 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+      const newScale = Math.min(5, Math.max(0.85, pinchStartScale * (dist / pinchStartDist)));
+
+      const currMidX = (t0.clientX + t1.clientX) / 2 - window.innerWidth / 2;
+      const currMidY = (t0.clientY + t1.clientY) / 2 - window.innerHeight / 2;
+
+      const scaleRatio = newScale / pinchStartScale;
+      panX = currMidX - (pinchStartMidX - startPanX) * scaleRatio;
+      panY = currMidY - (pinchStartMidY - startPanY) * scaleRatio;
+      zoomScale = newScale;
+
+      applyCurrZoomTransform(false);
+      return;
+    }
+
+    if (e.touches.length === 1 && !isPinching) {
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) hasMoved = true;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
 
+      // 拡大中は指に合わせて自由パン移動
       if (zoomScale > 1.02) {
-        panX = lastPanX + dx;
-        panY = lastPanY + dy;
-        applyLightboxTransform(false);
+        panX = startPanX + dx;
+        panY = startPanY + dy;
+        applyCurrZoomTransform(false);
+      } else if (isDraggingCarousel) {
+        // 等倍時は指の動きに1:1で追従して前後の画像がスライドインする
+        if (!gestureAxis) {
+          gestureAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+        }
+        if (gestureAxis === 'x') {
+          currentSwipeDx = lightboxList.length > 1 ? dx : dx * 0.25;
+          applyCarouselTrackOffset(currentSwipeDx, false);
+        }
       }
     }
   }, { passive: false });
 
-  stage.addEventListener('touchend', (e) => {
-    if (isPinching && e.touches.length === 0) {
+  carousel.addEventListener('touchend', (e) => {
+    if (isPinching && e.touches.length < 2) {
+      if (zoomScale <= 1.04) resetZoom(true);
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        startPanX = panX;
+        startPanY = panY;
+      }
       isPinching = false;
-      if (zoomScale <= 1.05) resetZoom();
       return;
     }
 
+    // タップ（移動なし）：シングルタップ＝メニュー表示切替、ダブルタップ＝タップ位置を中心に2.6倍拡大
     if (!hasMoved && e.changedTouches.length === 1) {
+      const tapX = e.changedTouches[0].clientX;
+      const tapY = e.changedTouches[0].clientY;
       const now = Date.now();
-      // ダブルタップで2.5倍拡大 ⇔ 等倍リセット
+
       if (now - lastTapTime < 280) {
         clearTimeout(tapTimeout);
-        if (zoomScale > 1.1) {
-          resetZoom();
+        if (zoomScale > 1.05) {
+          resetZoom(true);
         } else {
-          zoomScale = 2.5;
-          panX = 0;
-          panY = 0;
-          applyLightboxTransform(true);
+          const offsetX = tapX - window.innerWidth / 2;
+          const offsetY = tapY - window.innerHeight / 2;
+          zoomScale = 2.6;
+          panX = -offsetX * (zoomScale - 1);
+          panY = -offsetY * (zoomScale - 1);
+          applyCurrZoomTransform(true);
         }
         lastTapTime = 0;
       } else {
         lastTapTime = now;
-        // シングルタップでメニュー(HUD)の表示/非表示を切り替え
         tapTimeout = setTimeout(() => {
           document.getElementById('lightbox').classList.toggle('hud-hidden');
-        }, 260);
+        }, 250);
       }
       return;
     }
 
-    // 等倍時の左右スワイプで前後の画像へ切り替え
-    if (zoomScale <= 1.05 && e.changedTouches.length === 1) {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      const dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) stepLightbox(1);
-        else stepLightbox(-1);
+    // カルーセルスワイプ完了判定
+    if (isDraggingCarousel && gestureAxis === 'x') {
+      const threshold = window.innerWidth * 0.18;
+      if (lightboxList.length > 1 && currentSwipeDx < -threshold) {
+        // 次へスライド完了
+        applyCarouselTrackOffset(-window.innerWidth, true);
+        setTimeout(() => {
+          lightboxIndex = (lightboxIndex + 1) % lightboxList.length;
+          applyCarouselTrackOffset(0, false);
+          updateSlideImages();
+        }, 250);
+      } else if (lightboxList.length > 1 && currentSwipeDx > threshold) {
+        // 前へスライド完了
+        applyCarouselTrackOffset(window.innerWidth, true);
+        setTimeout(() => {
+          lightboxIndex = (lightboxIndex - 1 + lightboxList.length) % lightboxList.length;
+          applyCarouselTrackOffset(0, false);
+          updateSlideImages();
+        }, 250);
+      } else {
+        // 中央へスプリング復帰
+        applyCarouselTrackOffset(0, true);
       }
+      currentSwipeDx = 0;
+      isDraggingCarousel = false;
     }
   });
 
-  // PCクリック時にもメニュー表示/非表示を切り替え
-  stage.addEventListener('click', (e) => {
+  // PCクリック用
+  carousel.addEventListener('click', () => {
     if ('ontouchstart' in window) return;
     document.getElementById('lightbox').classList.toggle('hud-hidden');
   });
+}
+
+function showLightboxAt(idx) {
+  if (!lightboxList.length) return;
+  resetZoom(false);
+  applyCarouselTrackOffset(0, false);
+  lightboxIndex = (idx + lightboxList.length) % lightboxList.length;
+  updateSlideImages();
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function stepLightbox(dir) {
+  showLightboxAt(lightboxIndex + dir);
 }
 
 function openPortraitFullscreen() {
   const a = state.actresses.find(x => x.id === currentActressId);
   if (!a || !a.avatar) return;
   lightboxList = [{ src: a.avatar, id: a.id, type: 'portrait', label: a.name }];
-  lightboxIndex = 0;
   showLightboxAt(0);
 }
 
@@ -1660,36 +1976,21 @@ function openFolderLightbox(index) {
     type: 'media',
     label: `フォルダ (${i + 1}/${items.length})`
   }));
-  lightboxIndex = index;
-  showLightboxAt(lightboxIndex);
+  showLightboxAt(index);
 }
 
-function openWorkSamples(workId, autoParapara = false) {
-  const w = state.works.find(x => x.id === workId);
+function openWorkSampleAt(index, autoParapara = false) {
+  const w = state.works.find(x => x.id === currentWorkId);
   if (!w || !w.images || !w.images.length) return;
   lightboxList = w.images.map((src, i) => ({
     src,
-    id: workId,
+    id: w.id,
     type: 'work',
-    label: `${w.code ? '[' + w.code + '] ' : ''}${w.title} (${i + 1}/${w.images.length})`
+    label: `${w.code ? '[' + w.code + '] ' : ''}${i === 0 ? 'パッケージ表紙' : 'サンプル ' + i} (${i + 1}/${w.images.length})`
   }));
-  lightboxIndex = 0;
-  showLightboxAt(0);
+  showLightboxAt(index);
   if (autoParapara) toggleParapara(true);
 }
-
-function showLightboxAt(idx) {
-  if (!lightboxList.length) return;
-  resetZoom();
-  lightboxIndex = (idx + lightboxList.length) % lightboxList.length;
-  const item = lightboxList[lightboxIndex];
-  document.getElementById('lightbox-img').src = item.src;
-  document.getElementById('lightbox-caption').textContent = item.label;
-  document.getElementById('btn-lightbox-del').classList.toggle('hidden', item.type !== 'media');
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function stepLightbox(dir) { showLightboxAt(lightboxIndex + dir); }
 
 function toggleParapara(forceOn = false) {
   const btn = document.getElementById('btn-parapara');
@@ -1721,12 +2022,66 @@ function closeLightbox(e, force = false) {
     paraparaTimer = null;
     document.getElementById('btn-parapara').textContent = 'パラパラ再生: OFF';
   }
-  const lb = document.getElementById('lightbox');
-  lb.classList.remove('open', 'hud-hidden');
+  document.getElementById('lightbox').classList.remove('open', 'hud-hidden');
 }
 
 /* =========================================================
-   Birthday & Age Helper
+   Navigation & Views (Roster ➔ Actress Detail ➔ Work Detail)
+========================================================= */
+function handleHeaderBack() {
+  if (currentView === 'work-detail') {
+    openActressDetail(currentActressId);
+  } else {
+    showRoster();
+  }
+}
+
+function switchMainView(view) {
+  currentView = view;
+  ['roster', 'detail', 'work-detail', 'analytics', 'calendar', 'settings'].forEach(v => {
+    document.getElementById('view-' + v).classList.add('hidden');
+  });
+  ['roster', 'analytics', 'calendar', 'settings'].forEach(n => {
+    const el = document.getElementById('nav-' + n);
+    if (el) el.classList.remove('active');
+  });
+
+  document.getElementById('btn-back').classList.add('hidden');
+  document.getElementById('sync-indicator').classList.remove('hidden');
+  document.getElementById('btn-edit-actress').classList.add('hidden');
+  document.getElementById('btn-edit-work').classList.add('hidden');
+  document.getElementById('btn-top-action').classList.add('hidden');
+
+  if (view === 'roster') {
+    document.getElementById('view-roster').classList.remove('hidden');
+    document.getElementById('nav-roster').classList.add('active');
+    document.getElementById('header-title').textContent = '帝国の名簿';
+    document.getElementById('btn-top-action').classList.remove('hidden');
+    renderRoster();
+  } else if (view === 'analytics') {
+    document.getElementById('view-analytics').classList.remove('hidden');
+    document.getElementById('nav-analytics').classList.add('active');
+    document.getElementById('header-title').textContent = '好み分析・召喚';
+    renderAnalytics();
+    rollGacha();
+    if (tournamentPool.length === 0) startTournament();
+  } else if (view === 'calendar') {
+    document.getElementById('view-calendar').classList.remove('hidden');
+    document.getElementById('nav-calendar').classList.add('active');
+    document.getElementById('header-title').textContent = '指名履歴';
+    renderCalendar();
+  } else if (view === 'settings') {
+    document.getElementById('view-settings').classList.remove('hidden');
+    document.getElementById('nav-settings').classList.add('active');
+    document.getElementById('header-title').textContent = '設定・金庫同期';
+  }
+  window.scrollTo(0, 0);
+}
+
+function showRoster() { switchMainView('roster'); }
+
+/* =========================================================
+   Roster & Actress Detail & Work Detail Rendering
 ========================================================= */
 function calcAgeFromBirth(birthdate, fallbackAge) {
   if (birthdate) {
@@ -1759,51 +2114,6 @@ function createPlaceholderSVG(title, sub = '') {
   </svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
-
-/* =========================================================
-   Navigation & UI Rendering
-========================================================= */
-function switchMainView(view) {
-  ['roster', 'detail', 'analytics', 'calendar', 'settings'].forEach(v => {
-    document.getElementById('view-' + v).classList.add('hidden');
-  });
-  ['roster', 'analytics', 'calendar', 'settings'].forEach(n => {
-    const el = document.getElementById('nav-' + n);
-    if (el) el.classList.remove('active');
-  });
-
-  document.getElementById('btn-back').classList.add('hidden');
-  document.getElementById('sync-indicator').classList.remove('hidden');
-  document.getElementById('btn-edit-actress').classList.add('hidden');
-  document.getElementById('btn-top-action').classList.add('hidden');
-
-  if (view === 'roster') {
-    document.getElementById('view-roster').classList.remove('hidden');
-    document.getElementById('nav-roster').classList.add('active');
-    document.getElementById('header-title').textContent = '帝国の名簿';
-    document.getElementById('btn-top-action').classList.remove('hidden');
-    renderRoster();
-  } else if (view === 'analytics') {
-    document.getElementById('view-analytics').classList.remove('hidden');
-    document.getElementById('nav-analytics').classList.add('active');
-    document.getElementById('header-title').textContent = '好み分析・召喚';
-    renderAnalytics();
-    rollGacha();
-    if (tournamentPool.length === 0) startTournament();
-  } else if (view === 'calendar') {
-    document.getElementById('view-calendar').classList.remove('hidden');
-    document.getElementById('nav-calendar').classList.add('active');
-    document.getElementById('header-title').textContent = '指名履歴';
-    renderCalendar();
-  } else if (view === 'settings') {
-    document.getElementById('view-settings').classList.remove('hidden');
-    document.getElementById('nav-settings').classList.add('active');
-    document.getElementById('header-title').textContent = '設定・金庫同期';
-  }
-  window.scrollTo(0, 0);
-}
-
-function showRoster() { switchMainView('roster'); }
 
 function renderTagFilterBar() {
   const allTags = new Set();
@@ -1871,17 +2181,19 @@ function renderRoster() {
 }
 
 function openActressDetail(actressId) {
+  currentView = 'detail';
   currentActressId = actressId;
   const a = state.actresses.find(x => x.id === actressId);
   if (!a) return;
 
-  ['roster', 'analytics', 'calendar', 'settings'].forEach(v => {
+  ['roster', 'work-detail', 'analytics', 'calendar', 'settings'].forEach(v => {
     document.getElementById('view-' + v).classList.add('hidden');
   });
   document.getElementById('view-detail').classList.remove('hidden');
   document.getElementById('btn-back').classList.remove('hidden');
   document.getElementById('sync-indicator').classList.add('hidden');
   document.getElementById('btn-top-action').classList.add('hidden');
+  document.getElementById('btn-edit-work').classList.add('hidden');
   document.getElementById('btn-edit-actress').classList.remove('hidden');
   document.getElementById('header-title').textContent = a.name;
 
@@ -1898,7 +2210,8 @@ function openActressDetail(actressId) {
   });
   document.getElementById('detail-specs').innerHTML = specsHtml;
 
-  switchDetailTab('works');
+  renderWorksList();
+  renderFolderGrid();
   window.scrollTo(0, 0);
 }
 
@@ -1924,24 +2237,70 @@ function renderWorksList() {
   container.innerHTML = works.map(w => {
     const cover = (w.images && w.images[0]) ? w.images[0] : '';
     const sampleCount = w.images ? w.images.length : 0;
+    const tagsHtml = (w.tags || []).map(t => `<span class="work-card-tag">#${t}</span>`).join('');
     return `
-      <div class="work-card">
-        <img class="work-cover" src="${cover}" alt="" referrerpolicy="no-referrer" onclick="openWorkSamples('${w.id}')">
+      <div class="work-card" onclick="openWorkDetail('${w.id}')">
+        <img class="work-cover" src="${cover}" alt="" referrerpolicy="no-referrer">
         <div class="work-info">
           <div>
             <div class="work-code">${w.code || ''}</div>
             <div class="work-title">${w.title}</div>
+            ${tagsHtml ? `<div class="work-card-tags">${tagsHtml}</div>` : ''}
           </div>
-          <div class="work-actions">
-            <button class="btn-mini" onclick="openWorkSamples('${w.id}')">全画面 (${sampleCount}枚)</button>
-            <button class="btn-mini" onclick="openWorkSamples('${w.id}', true)">パラパラ再生</button>
-            ${w.url ? `<a class="btn-mini" href="${w.url}" target="_blank" onclick="nominateActress('${currentActressId}', true)">Safari視聴</a>` : ''}
-            <button class="btn-mini" onclick="deleteWork('${w.id}')">削除</button>
+          <div style="font-size:0.7rem; color:var(--gold-main); font-family:sans-serif;">
+            収録画像 ${sampleCount}枚 ＞ 詳細を開く
           </div>
         </div>
       </div>
     `;
   }).join('');
+}
+
+/* --- 新設：作品詳細画面 (Work Detail View) --- */
+function openWorkDetail(workId) {
+  currentView = 'work-detail';
+  currentWorkId = workId;
+  const w = state.works.find(x => x.id === workId);
+  if (!w) return;
+
+  ['roster', 'detail', 'analytics', 'calendar', 'settings'].forEach(v => {
+    document.getElementById('view-' + v).classList.add('hidden');
+  });
+  document.getElementById('view-work-detail').classList.remove('hidden');
+
+  document.getElementById('btn-back').classList.remove('hidden');
+  document.getElementById('sync-indicator').classList.add('hidden');
+  document.getElementById('btn-top-action').classList.add('hidden');
+  document.getElementById('btn-edit-actress').classList.add('hidden');
+  document.getElementById('btn-edit-work').classList.remove('hidden');
+  document.getElementById('header-title').textContent = w.code || '作品詳細';
+
+  const images = w.images || [];
+  document.getElementById('wd-cover').src = images[0] || '';
+  document.getElementById('wd-code').textContent = w.code || '';
+  document.getElementById('wd-title').textContent = w.title || '';
+
+  const tagsEl = document.getElementById('wd-tags');
+  tagsEl.innerHTML = (w.tags || []).map(t => `<span class="spec-pill">#${t}</span>`).join('');
+
+  const urlBtn = document.getElementById('wd-url-btn');
+  if (w.url) {
+    urlBtn.href = w.url;
+    urlBtn.classList.remove('hidden');
+  } else {
+    urlBtn.classList.add('hidden');
+  }
+
+  document.getElementById('wd-sample-count').textContent = `収録イメージ (${images.length}枚)`;
+  const grid = document.getElementById('wd-sample-grid');
+  grid.innerHTML = images.map((src, idx) => `
+    <div class="sample-thumb-card" onclick="openWorkSampleAt(${idx})">
+      <img src="${src}" alt="" referrerpolicy="no-referrer">
+      <span class="sample-index-badge">${idx === 0 ? '表紙' : idx}</span>
+    </div>
+  `).join('');
+
+  window.scrollTo(0, 0);
 }
 
 function renderFolderGrid() {
@@ -1960,7 +2319,7 @@ function renderFolderGrid() {
 }
 
 /* =========================================================
-   Preference DNA Analytics
+   Preference DNA Analytics (女優属性 ＋ 作品タグも統合分析)
 ========================================================= */
 function renderAnalytics() {
   const actresses = state.actresses;
@@ -1995,6 +2354,14 @@ function renderAnalytics() {
     (a.tags || []).forEach(t => {
       tagScores['#' + t] = (tagScores['#' + t] || 0) + w;
     });
+
+    // その女優の登録作品タグも重み付け集計
+    const actWorks = state.works.filter(wk => wk.actressId === a.id);
+    actWorks.forEach(wk => {
+      (wk.tags || []).forEach(wt => {
+        tagScores['#' + wt] = (tagScores['#' + wt] || 0) + Math.max(1, Math.round(w * 0.7));
+      });
+    });
   });
 
   document.getElementById('dna-total-count').textContent = `総指名：${totalWeight}回`;
@@ -2012,7 +2379,7 @@ function renderAnalytics() {
 
   renderBarList('dna-cup-bars', cupScores, 5);
   renderBarList('dna-age-bars', ageBracketScores, 4);
-  renderBarList('dna-tag-bars', tagScores, 8);
+  renderBarList('dna-tag-bars', tagScores, 10);
 }
 
 function renderBarList(containerId, scoreMap, limit) {
@@ -2265,7 +2632,7 @@ function pickVsWinner(idx) {
 }
 
 /* =========================================================
-   Modals: Actress & Work CRUD
+   Modals: Actress & Work CRUD (作品の編集・作品タグ対応)
 ========================================================= */
 function openActressModal(actressId = null) {
   const modal = document.getElementById('modal-actress');
@@ -2355,22 +2722,44 @@ async function deleteActress() {
   showRoster();
 }
 
-function openWorkModal() {
-  document.getElementById('work-code').value = '';
-  document.getElementById('work-title').value = '';
-  document.getElementById('work-url').value = '';
-  document.getElementById('work-files').value = '';
-  document.getElementById('work-sample-urls').value = '';
+function openWorkModal(workId = null) {
+  const delBtn = document.getElementById('btn-delete-work');
   document.getElementById('autofetch-status').textContent = '';
-  document.getElementById('autofetch-preview').innerHTML = '';
+  document.getElementById('work-files').value = '';
+
+  if (workId) {
+    const w = state.works.find(x => x.id === workId);
+    if (!w) return;
+    document.getElementById('work-modal-title').textContent = '作品データの編集';
+    document.getElementById('edit-work-id').value = w.id;
+    document.getElementById('work-code').value = w.code || '';
+    document.getElementById('work-title').value = w.title || '';
+    document.getElementById('work-tags').value = (w.tags || []).join(', ');
+    document.getElementById('work-url').value = w.url || '';
+    document.getElementById('work-sample-urls').value = (w.images || []).join('\n');
+    delBtn.classList.remove('hidden');
+    renderUrlPreviewStrip();
+  } else {
+    document.getElementById('work-modal-title').textContent = '作品・サンプル画像の登録';
+    document.getElementById('edit-work-id').value = '';
+    document.getElementById('work-code').value = '';
+    document.getElementById('work-title').value = '';
+    document.getElementById('work-tags').value = '';
+    document.getElementById('work-url').value = '';
+    document.getElementById('work-sample-urls').value = '';
+    document.getElementById('autofetch-preview').innerHTML = '';
+    delBtn.classList.add('hidden');
+  }
   document.getElementById('modal-work').classList.add('open');
 }
 
 function closeWorkModal() { document.getElementById('modal-work').classList.remove('open'); }
 
 async function saveWork() {
+  const editId = document.getElementById('edit-work-id').value;
   const code = document.getElementById('work-code').value.trim().toUpperCase();
   const title = document.getElementById('work-title').value.trim() || code || '無題の作品';
+  const tags = document.getElementById('work-tags').value.split(',').map(s => s.trim()).filter(Boolean);
   const url = document.getElementById('work-url').value.trim();
 
   const images = [];
@@ -2388,25 +2777,42 @@ async function saveWork() {
     images.push(createPlaceholderSVG(code || 'ARCHIVE', title.slice(0, 14)));
   }
 
-  state.works.unshift({
-    id: 'w_' + Date.now(),
-    actressId: currentActressId,
-    code,
-    title,
-    url,
-    images
-  });
-
-  await saveState();
-  closeWorkModal();
-  renderWorksList();
+  if (editId) {
+    const w = state.works.find(x => x.id === editId);
+    if (w) {
+      w.code = code;
+      w.title = title;
+      w.tags = tags;
+      w.url = url;
+      w.images = images;
+    }
+    await saveState();
+    closeWorkModal();
+    openWorkDetail(editId);
+  } else {
+    const newWorkId = 'w_' + Date.now();
+    state.works.unshift({
+      id: newWorkId,
+      actressId: currentActressId,
+      code,
+      title,
+      tags,
+      url,
+      images
+    });
+    await saveState();
+    closeWorkModal();
+    renderWorksList();
+  }
 }
 
-async function deleteWork(workId) {
-  if (!confirm('この作品を削除しますか？')) return;
-  state.works = state.works.filter(w => w.id !== workId);
+async function deleteWorkFromModal() {
+  const editId = document.getElementById('edit-work-id').value;
+  if (!editId || !confirm('この作品を削除しますか？')) return;
+  state.works = state.works.filter(w => w.id !== editId);
   await saveState();
-  renderWorksList();
+  closeWorkModal();
+  openActressDetail(currentActressId);
 }
 
 /* =========================================================
