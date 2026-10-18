@@ -233,7 +233,6 @@
     transition: filter 0.3s ease;
   }
 
-  /* めくる（フリップ）ボタン＆インジケーター */
   .flip-badge {
     position: absolute;
     bottom: 12px;
@@ -388,7 +387,7 @@
     font-weight: 600;
   }
 
-  /* Folder Grid (4 Columns) */
+  /* Folder Grid */
   .folder-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -523,7 +522,7 @@
     border-radius: 3px;
   }
 
-  /* Panels & Charts */
+  /* Panels */
   .section-wrap {
     padding: 16px 14px;
     display: flex;
@@ -584,7 +583,6 @@
     font-size: 0.74rem;
   }
 
-  /* Gacha & VS */
   .gacha-stage {
     margin: 14px auto;
     width: 200px;
@@ -629,7 +627,6 @@
     margin-top: 10px;
   }
 
-  /* Calendar */
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -857,7 +854,7 @@
   </div>
 </header>
 
-<!-- VIEW 1: ROSTER (大判シネマティック・カード ＆ めくるギミック) -->
+<!-- VIEW 1: ROSTER -->
 <section id="view-roster">
   <div class="control-bar">
     <div class="control-top">
@@ -1095,7 +1092,12 @@
       <input type="text" id="act-tags" placeholder="透明感, 清楚, 巨乳, 色白">
     </div>
     <div class="form-row">
-      <label>ポートレート画像（ファイル選択 または 画像URL）</label>
+      <label>裏の顔（めくった時に出るトロント下目線カットなど）</label>
+      <input type="file" id="act-flip-file" accept="image/*">
+      <input type="text" id="act-flip-url" placeholder="https://... (裏側の画像URL)">
+    </div>
+    <div class="form-row">
+      <label>ポートレート画像（表の顔）</label>
       <input type="file" id="act-file" accept="image/*">
       <input type="text" id="act-img-url" placeholder="https://...">
     </div>
@@ -1164,14 +1166,14 @@
     <span>履歴</span>
   </div>
   <div id="nav-settings" class="nav-item" onclick="switchMainView('settings')">
-    <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span>設定</span>
   </div>
 </nav>
 
 <script>
 /* =========================================================
-   IndexedDB & Vault Sync Engine (ランダム自動補充・めくるギミック対応)
+   IndexedDB & Vault Sync Engine (クリーン起動・めくるギミック対応)
 ========================================================= */
 const DB_NAME = 'EmpireArchiveDB';
 const DB_VERSION = 1;
@@ -1198,46 +1200,6 @@ let tournamentPool = [];
 let tournamentNext = [];
 let ghFileSha = null;
 let syncTimer = null;
-
-// 初回データゼロの時に自動で並べる「清楚系美女×ギャップ」の厳選シネマティックプール
-const DEFAULT_PRESET_ACTRESSES = [
-  {
-    id: 'preset_remu',
-    name: '涼森れむ',
-    birthdate: '1997-06-15',
-    cup: 'F',
-    height: 162,
-    tags: ['透明感', '清楚', '色白'],
-    avatar: 'https://pics.dmm.co.jp/digital/video/118abf391/118abf391pl.jpg',
-    flipAvatar: 'https://pics.dmm.co.jp/digital/video/118abf391/118abf391jp-3.jpg',
-    count: 12,
-    createdAt: Date.now() - 86400000 * 5
-  },
-  {
-    id: 'preset_mikami',
-    name: '三上悠亜',
-    birthdate: '1993-08-16',
-    cup: 'E',
-    height: 159,
-    tags: ['アイドル', '甘えん坊', '小悪魔'],
-    avatar: 'https://pics.dmm.co.jp/digital/video/h_1234sone123/h_1234sone123pl.jpg',
-    flipAvatar: 'https://pics.dmm.co.jp/digital/video/h_1234sone123/h_1234sone123jp-2.jpg',
-    count: 24,
-    createdAt: Date.now() - 86400000 * 10
-  },
-  {
-    id: 'preset_kaho',
-    name: '石川澪',
-    birthdate: '2003-02-18',
-    cup: 'D',
-    height: 155,
-    tags: ['美少女', 'ピュア', '主観'],
-    avatar: 'https://pics.dmm.co.jp/digital/video/mjh00123/mjh00123pl.jpg',
-    flipAvatar: 'https://pics.dmm.co.jp/digital/video/mjh00123/mjh00123jp-4.jpg',
-    count: 8,
-    createdAt: Date.now() - 86400000 * 2
-  }
-];
 
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -1273,11 +1235,6 @@ function loadState() {
     req.onsuccess = () => {
       if (req.result) {
         state = req.result;
-      }
-      // もしデータが完全ゼロなら、自動的に厳選シネマティックプリセットを補充
-      if (!state.actresses || state.actresses.length === 0) {
-        state.actresses = [...DEFAULT_PRESET_ACTRESSES];
-        saveState(true);
       }
       resolve();
     };
@@ -1396,7 +1353,7 @@ async function pullFromGitHub(manual = false) {
     }
 
     const remoteState = JSON.parse(jsonStr);
-    if (remoteState && Array.isArray(remoteState.actresses) && remoteState.actresses.length > 0) {
+    if (remoteState && Array.isArray(remoteState.actresses)) {
       if (manual || (remoteState.updatedAt || 0) > (state.updatedAt || 0)) {
         state = remoteState;
         await saveState(true);
@@ -1894,14 +1851,16 @@ function renderRoster() {
 
   const container = document.getElementById('roster-grid');
   if (list.length === 0) {
-    container.innerHTML = `<div style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">女優が登録されていません</div>`;
+    container.innerHTML = `<div style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:0.85rem;">女優が登録されていません。<br>右上の「＋ 登録」から追加してください。</div>`;
     return;
   }
 
-  // 大判シネマティック・カード（「めくる」ギミック搭載）
+  // 大判シネマティック・カード（「めくる」ギミック搭載：裏側が未設定なら作品サンプルから自動採用）
   container.innerHTML = list.map(a => {
     const defaultImg = a.avatar || '';
-    const flipImg = a.flipAvatar || a.avatar || '';
+    const aWorks = state.works.filter(w => w.actressId === a.id);
+    const firstWorkImg = (aWorks[0] && aWorks[0].images && aWorks[0].images[1]) ? aWorks[0].images[1] : (aWorks[0] && aWorks[0].images && aWorks[0].images[0] ? aWorks[0].images[0] : defaultImg);
+    const flipImg = a.flipAvatar || firstWorkImg || defaultImg;
     const ageStr = formatBirthDisplay(a.birthdate, a.age) || '';
     const tagsHtml = (a.tags || []).map(t => `#${t}`).join(' ');
 
@@ -1926,7 +1885,6 @@ function renderRoster() {
   }).join('');
 }
 
-// 画面上で「めくる」ボタンを押したときに、表の顔 ⇔ 裏の乱れた姿をペラッと切り替える演出
 function toggleCardFlip(actressId) {
   const imgEl = document.getElementById(`img-${actressId}`);
   const labelEl = document.getElementById(`flee-label-${actressId}`);
@@ -2253,6 +2211,7 @@ function openActressModal(actressId = null) {
     document.getElementById('act-cup').value = a.cup || '';
     document.getElementById('act-height').value = a.height || '';
     document.getElementById('act-tags').value = (a.tags || []).join(', ');
+    document.getElementById('act-flip-url').value = a.flipAvatar || '';
     delBtn.classList.remove('hidden');
   } else {
     document.getElementById('edit-actress-id').value = '';
@@ -2261,9 +2220,12 @@ function openActressModal(actressId = null) {
     document.getElementById('act-cup').value = '';
     document.getElementById('act-height').value = '';
     document.getElementById('act-tags').value = '';
+    document.getElementById('act-flip-url').value = '';
     delBtn.classList.add('hidden');
   }
-  document.getElementById('act-file').value = ''; modal.classList.add('open');
+  document.getElementById('act-file').value = '';
+  document.getElementById('act-flip-file').value = '';
+  modal.classList.add('open');
 }
 
 function closeActressModal() { document.getElementById('modal-actress').classList.remove('open'); }
@@ -2278,18 +2240,28 @@ async function saveActress() {
   const tags = document.getElementById('act-tags').value.split(',').map(s => s.trim()).filter(Boolean);
 
   const fileInput = document.getElementById('act-file');
+  const urlInput = document.getElementById('act-img-url').value.trim();
+  const flipFileInput = document.getElementById('act-flip-file');
+  const flipUrlInput = document.getElementById('act-flip-url').value.trim();
+
   let avatarData = null;
   if (fileInput.files && fileInput.files[0]) avatarData = await fileToDataUrl(fileInput.files[0], 680);
+  else if (urlInput) avatarData = urlInput;
+
+  let flipAvatarData = null;
+  if (flipFileInput.files && flipFileInput.files[0]) flipAvatarData = await fileToDataUrl(flipFileInput.files[0], 680);
+  else if (flipUrlInput) flipAvatarData = flipUrlInput;
 
   if (id) {
     const a = state.actresses.find(x => x.id === id);
     a.name = name; a.birthdate = birthdate; a.cup = cup; a.height = height; a.tags = tags;
     if (avatarData) a.avatar = avatarData;
+    if (flipAvatarData) a.flipAvatar = flipAvatarData;
   } else {
     state.actresses.unshift({
       id: 'act_' + Date.now(), name, birthdate, cup, height, tags,
       avatar: avatarData || createPlaceholderSVG(name),
-      flipAvatar: avatarData || createPlaceholderSVG(name, '裏の顔'),
+      flipAvatar: flipAvatarData || avatarData || createPlaceholderSVG(name, '裏の顔'),
       count: 0, createdAt: Date.now()
     });
   }
